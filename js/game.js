@@ -231,7 +231,9 @@ const Game = (() => {
     });
     if (current !== item || screen !== "results" || !result) return;
     $("results-score-num").textContent = result.score;
-    $("results-score-msg").textContent = scoreMessage(result.score);
+    $("results-score-msg").textContent = result.estimated
+      ? "Estimated from your drawing only (the original image couldn't be read; run the game from a local server like VS Code Live Server)."
+      : scoreMessage(result.score);
     streak = result.score >= STREAK_MIN ? streak + 1 : 0;
     renderStreak();
     await Scoreboard.ready;
