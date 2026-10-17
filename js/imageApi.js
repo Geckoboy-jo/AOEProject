@@ -77,12 +77,14 @@ const ImageApi = (() => {
         alt: p.alt,
         prompt: p.prompt,
         category,
-        credit: {
-          name: p.credit.name,
-          link: p.credit.link,
-          site: p.credit.site || "Unsplash",
-          siteLink: p.credit.siteLink || `https://unsplash.com/?${UTM}`,
-        },
+        credit: p.credit // null for the team's own images
+          ? {
+              name: p.credit.name,
+              link: p.credit.link,
+              site: p.credit.site || "Unsplash",
+              siteLink: p.credit.siteLink || `https://unsplash.com/?${UTM}`,
+            }
+          : null,
         source: "cache",
       });
     }

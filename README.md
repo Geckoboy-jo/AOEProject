@@ -21,11 +21,20 @@ This was a college project, so I only have the funtionality required for the pro
 
 Pick **Treat** (spooky) or **Trick** (cheeky): an image shows for 6 seconds, then you draw it from memory before the timer runs out and compare yours to the original.
 
-**Images (Pixabay illustrations + clipart):**
-1. Get a free API key at https://pixabay.com/api/docs (sign in, the key is on that page).
-2. `cp js/config.example.js js/config.js` and set `PIXABAY_API_KEY` (or pass it as an env var).
-3. `node scripts/build-pixabay-cache.js` downloads images into `assets/pixabay/` and writes `assets/pixabay/cache.js`.
-4. Search terms live in `js/queries.js`, split into `treat` (spooky) and `trick` (cheeky).
-5. To drop a bad image: delete its entry in `cache.js` and add its id to `assets/pixabay/blocklist.json`.
+**Images:** the folder an image is in is its category.
+
+```
+assets/pixabay/treat/      spooky images (Treat button)
+assets/pixabay/trick/      cheeky images (Trick button)
+assets/pixabay/credits.json  Pixabay credit per image id
+assets/pixabay/cache.js    generated, don't edit by hand
+```
+
+To curate, use Finder, then run `node scripts/build-pixabay-cache.js` (no key needed):
+- **Bad image:** delete the file. It won't be downloaded again.
+- **Wrong category:** drag it into the other folder.
+- **Your own image:** drop a .png/.jpg into a folder. The file name is the prompt (`rubber-duck.png` becomes "rubber duck").
+
+To download more: get a free key at https://pixabay.com/api/docs, `cp js/config.example.js js/config.js`, set `PIXABAY_API_KEY`, and run `node scripts/build-pixabay-cache.js --fetch`. Search terms live in `js/queries.js`, split into `treat` and `trick`.
 
 With no image cache, the game falls back to the live Unsplash API (if `UNSPLASH_ACCESS_KEY` is set) or built-in emoji images.
