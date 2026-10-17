@@ -121,6 +121,8 @@ const Scoring = (() => {
     const c = document.createElement("canvas");
     c.width = c.height = 64;
     const ctx = c.getContext("2d", { willReadFrequently: true });
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, 64, 64);
     ctx.drawImage(canvas, 0, 0, 64, 64);
     const d = ctx.getImageData(0, 0, 64, 64).data;
     let ink = 0;
@@ -141,10 +143,25 @@ const Scoring = (() => {
   }
 
   // used when the original can't be read back (blocked by the browser):
-  // score the drawing's effort alone, kept generous
+  // score the drawing's effort alone (ink coverage + color variety), capped at 80
   function fallbackScore(drawingCanvas) {
-    const effort = clamp01(inkCoverage(drawingCanvas) / 0.06);
-    return { score: Math.round(1 + 74 * effort), parts: null, estimated: true };
+    const c = document.createElement("canvas");
+    c.width = c.height = 64;
+    const ctx = c.getContext("2d", { willReadFrequently: true });
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, 64, 64);
+    ctx.drawImage(drawingCanvas, 0, 0, 64, 64);
+    const d = ctx.getImageData(0, 0, 64, 64).data;
+    const colors = new Set();
+    for (let i = 0; i < d.length; i += 4) {
+      if (d[i] < 245 || d[i + 1] < 245 || d[i + 2] < 245) {
+        colors.add(((d[i] >> 5) << 6) | ((d[i + 1] >> 5) << 3) | (d[i + 2] >> 5));
+      }
+    }
+    const coverage = clamp01(inkCoverage(drawingCanvas) / 0.3);
+    const variety = clamp01(colors.size / 12);
+    const effort = coverage * 0.75 + variety * 0.25;
+    return { score: Math.round(1 + 79 * effort), parts: null, estimated: true };
   }
 
   async function compare(drawingCanvas, originalSrc) {
