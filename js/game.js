@@ -44,7 +44,8 @@ const Game = (() => {
     streak = Number(localStorage.getItem("ghoulle-streak")) || 0;
   } catch (err) {}
   function renderStreak() {
-    $("streak-count").textContent = streak;
+    const countEl = $("streak-count");
+    if (countEl) countEl.textContent = streak;
     try {
       localStorage.setItem("ghoulle-streak", streak);
     } catch (err) {}

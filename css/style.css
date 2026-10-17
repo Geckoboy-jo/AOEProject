@@ -176,10 +176,49 @@ body {
   outline: 2px solid #fff;
 }
 
-/* icon buttons: one shared background image + a separate icon image per button */
+/* text buttons: base art picked by button size (1x1 = 32px square, 1x3 = 96x32, 1x4 = 128x32) */
 :root {
-  --icon-button-bg: url("../assets/ui/ui-button-square.png");
+  --btn-1x1: url("../assets/ui/ui-button-1x1.png");
+  --btn-1x3: url("../assets/ui/ui-button-1x3.png");
+  --btn-1x4: url("../assets/ui/ui-button-1x4.png");
+  --icon-button-bg: url("../assets/ui/ui-button-1x1.png");
 }
+
+#dropper,
+.htp-close,
+#layer-toggle button,
+#round-bar button,
+.settings-actions button,
+.results-actions button,
+.mode-btn {
+  border: var(--bw, 3px) solid #8a4650;
+  border-radius: 0;
+  color: #fff;
+  text-shadow: 0 1px 2px #000;
+  background: #a14d55;
+  border-image: var(--btn-art) 3 fill / var(--bw, 3px) stretch;
+  image-rendering: pixelated;
+}
+
+#dropper {
+  min-width: 0;
+  padding: 0;
+}
+
+.mode-btn { --bw: 6px; }
+
+#dropper,
+.htp-close { --btn-art: var(--btn-1x1); }
+#layer-toggle button,
+#round-bar button,
+#results-save,
+#results-share,
+.settings-actions [data-close] { --btn-art: var(--btn-1x3); }
+#settings-quit,
+#results-again,
+.mode-btn { --btn-art: var(--btn-1x4); }
+
+/* icon buttons: one shared background image + a separate icon image per button */
 
 .icon-button {
   position: relative;
@@ -294,8 +333,8 @@ body {
 }
 
 #color-row .tool {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   font-size: 16px;
   flex: none;
 }
@@ -385,7 +424,8 @@ body {
 
 #layer-toggle button {
   flex: 1;
-  padding: 6px 2px;
+  height: 32px;
+  padding: 0 2px;
   font-size: 16px;
   cursor: pointer;
 }
@@ -431,8 +471,9 @@ body {
   position: absolute;
   top: 10px;
   right: 12px;
-  border: 0;
-  background: none;
+  width: 32px;
+  height: 32px;
+  padding: 0;
   font-size: 32px;
   line-height: 1;
   cursor: pointer;
@@ -474,7 +515,9 @@ body {
 }
 
 .settings-actions button {
-  padding: 6px 14px;
+  height: 32px;
+  min-width: 96px;
+  padding: 0 14px;
   cursor: pointer;
 }
 
