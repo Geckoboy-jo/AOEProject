@@ -39,6 +39,12 @@
           <div id="draw-tools">
             <button id="tool-brush" class="tool active" type="button" title="Brush" aria-pressed="true">🖌️</button>
             <button id="tool-eraser" class="tool" type="button" title="Eraser" aria-pressed="false">🧽</button>
+            <button id="tool-fill" class="tool" type="button" title="Bucket fill" aria-pressed="false">🪣</button>
+          </div>
+          <div class="panel-label">Layer</div>
+          <div id="layer-toggle" role="radiogroup" aria-label="Drawing layer">
+            <button id="layer-bg" type="button" data-layer="bg" title="Draw behind">Background</button>
+            <button id="layer-fg" type="button" data-layer="fg" class="active" title="Draw in front">Foreground</button>
           </div>
           <canvas id="color-wheel" width="240" height="240" aria-label="Color wheel"></canvas>
           <div id="color-row">
@@ -60,6 +66,11 @@
             <button type="button" data-size="6" class="active" title="Medium"><i style="--d:10px"></i></button>
             <button type="button" data-size="12" title="Large"><i style="--d:16px"></i></button>
             <button type="button" data-size="24" title="Huge"><i style="--d:24px"></i></button>
+          </div>
+          <div class="panel-label">Saved colors</div>
+          <div id="saved-slots" role="radiogroup" aria-label="Saved colors">
+            <button type="button" class="slot active" data-slot="0" title="Saved color 1"></button>
+            <button type="button" class="slot" data-slot="1" title="Saved color 2"></button>
           </div>
           <div class="panel-label">Swatches</div>
           <div id="swatches"></div>

@@ -206,6 +206,30 @@ html, body {
   gap: 6px;
 }
 
+#layer-toggle,
+#saved-slots {
+  display: flex;
+  gap: 6px;
+}
+
+#layer-toggle button {
+  flex: 1;
+  padding: 6px 2px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+#layer-toggle button.active { outline: 2px solid #333; font-weight: bold; }
+
+.slot {
+  flex: 1;
+  height: 32px;
+  border: 1px solid #999;
+  cursor: pointer;
+}
+
+.slot.active { outline: 3px solid #333; outline-offset: 1px; }
+
 .swatch {
   aspect-ratio: 1;
   border: 1px solid #999;

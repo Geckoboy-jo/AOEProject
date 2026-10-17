@@ -35,9 +35,17 @@ const createCanvas = () => {
     const dropperStatus = document.getElementById("dropper-status");
     let paint = false;
     let color = "#000000";
-    let size = 6;
+    let layer = "fg";
+    const sizes = { bg: 12, fg: 6 }; // brush size remembered per layer
     let tool = "brush";
     let currentAction;
+    const fillBtn = document.getElementById("tool-fill");
+    const sizeButtons = document.querySelectorAll("#brush-sizes button");
+    const layerButtons = document.querySelectorAll("#layer-toggle button");
+    const slotButtons = document.querySelectorAll("#saved-slots button");
+    const slots = ["#000000", "#ffffff"];
+    let activeSlot = 0;
+    const layerCanvases = { bg: document.createElement("canvas"), fg: document.createElement("canvas") };
 
     canvas.setAttribute("id", "canvas");
     canvasDiv.appendChild(canvas);
@@ -64,9 +72,28 @@ const createCanvas = () => {
         document.getElementById("selected-color"),
         (selectedColor) => {
             color = selectedColor;
+            slots[activeSlot] = selectedColor;
+            renderSlots();
             setTool("brush"); // picking a color switches back to the brush
         }
     );
+
+    function renderSlots() {
+        slotButtons.forEach((btn, i) => {
+            btn.style.background = slots[i];
+            btn.classList.toggle("active", i === activeSlot);
+            btn.setAttribute("aria-checked", i === activeSlot);
+        });
+    }
+    renderSlots();
+    slotButtons.forEach((btn, i) => {
+        btn.addEventListener("click", () => {
+            activeSlot = i;
+            renderSlots();
+            const n = parseInt(slots[i].slice(1), 16);
+            colorWheel.setRgbColor(n >> 16 & 255, n >> 8 & 255, n & 255);
+        });
+    });
 
     const swatchGrid = document.getElementById("swatches");
     SWATCHES.forEach((hex) => {
@@ -85,7 +112,7 @@ const createCanvas = () => {
     // ---- tools ----
     function setTool(next) {
         tool = next;
-        [[brushBtn, "brush"], [eraserBtn, "eraser"], [dropperBtn, "dropper"]].forEach(([btn, name]) => {
+        [[brushBtn, "brush"], [eraserBtn, "eraser"], [dropperBtn, "dropper"], [fillBtn, "fill"]].forEach(([btn, name]) => {
             btn.classList.toggle("active", tool === name);
             btn.setAttribute("aria-pressed", tool === name);
         });
@@ -97,6 +124,7 @@ const createCanvas = () => {
     }
     brushBtn.addEventListener("click", () => setTool("brush"));
     eraserBtn.addEventListener("click", () => setTool("eraser"));
+    fillBtn.addEventListener("click", () => setTool("fill"));
     // dropper: uses the browser EyeDropper API (any pixel on screen); falls back to canvas-only sampling
     dropperBtn.addEventListener("click", async () => {
         if (!window.EyeDropper) {
@@ -130,43 +158,131 @@ const createCanvas = () => {
         }, 2000);
     }
 
-    document.querySelectorAll("#brush-sizes button").forEach((btn) => {
+    function renderSizeButtons() {
+        sizeButtons.forEach((b) => b.classList.toggle("active", Number(b.dataset.size) === sizes[layer]));
+    }
+    sizeButtons.forEach((btn) => {
         btn.addEventListener("click", () => {
-            size = Number(btn.dataset.size);
-            document.querySelectorAll("#brush-sizes button").forEach((b) => b.classList.toggle("active", b === btn));
+            sizes[layer] = Number(btn.dataset.size);
+            renderSizeButtons();
         });
     });
+
+    function setLayer(next) {
+        layer = next;
+        layerButtons.forEach((b) => {
+            b.classList.toggle("active", b.dataset.layer === layer);
+            b.setAttribute("aria-checked", b.dataset.layer === layer);
+        });
+        renderSizeButtons();
+    }
+    layerButtons.forEach((btn) => btn.addEventListener("click", () => setLayer(btn.dataset.layer)));
+    setLayer(layer);
 
     document.getElementById("settings-btn").addEventListener("click", openPopup);
 
     // ---- drawing ----
+    // flood fill on one layer's pixels (compares RGBA with a small tolerance)
+    function floodFill(ctx, startX, startY, hex) {
+        const w = ctx.canvas.width;
+        const h = ctx.canvas.height;
+        const x0 = Math.max(0, Math.min(w - 1, Math.floor(startX)));
+        const y0 = Math.max(0, Math.min(h - 1, Math.floor(startY)));
+        const image = ctx.getImageData(0, 0, w, h);
+        const d = image.data;
+        const n = parseInt(hex.slice(1), 16);
+        const fill = [n >> 16 & 255, n >> 8 & 255, n & 255, 255];
+        const i0 = (y0 * w + x0) * 4;
+        const target = [d[i0], d[i0 + 1], d[i0 + 2], d[i0 + 3]];
+        const TOLERANCE = 32;
+        if (target.every((v, k) => v === fill[k])) return;
+
+        const matches = (i) =>
+            Math.abs(d[i] - target[0]) <= TOLERANCE &&
+            Math.abs(d[i + 1] - target[1]) <= TOLERANCE &&
+            Math.abs(d[i + 2] - target[2]) <= TOLERANCE &&
+            Math.abs(d[i + 3] - target[3]) <= TOLERANCE;
+        const seen = new Uint8Array(w * h);
+        const stack = [x0, y0];
+        while (stack.length) {
+            const y = stack.pop();
+            let x = stack.pop();
+            while (x >= 0 && !seen[y * w + x] && matches((y * w + x) * 4)) x--;
+            x++;
+            let up = false;
+            let down = false;
+            while (x < w && !seen[y * w + x] && matches((y * w + x) * 4)) {
+                const p = y * w + x;
+                seen[p] = 1;
+                d[p * 4] = fill[0];
+                d[p * 4 + 1] = fill[1];
+                d[p * 4 + 2] = fill[2];
+                d[p * 4 + 3] = 255;
+                if (y > 0) {
+                    const ok = !seen[p - w] && matches((p - w) * 4);
+                    if (ok && !up) stack.push(x, y - 1);
+                    up = ok;
+                }
+                if (y < h - 1) {
+                    const ok = !seen[p + w] && matches((p + w) * 4);
+                    if (ok && !down) stack.push(x, y + 1);
+                    down = ok;
+                }
+                x++;
+            }
+        }
+        ctx.putImageData(image, 0, 0);
+    }
+
+    function drawStroke(ctx, action) {
+        const points = action.points;
+        const width = action.size || 5;
+
+        ctx.globalCompositeOperation = action.erase ? "destination-out" : "source-over";
+        ctx.strokeStyle = action.color;
+        ctx.fillStyle = action.color;
+        ctx.lineJoin = "round";
+        ctx.lineCap = "round";
+        ctx.lineWidth = width;
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+
+        for (let i = 1; i < points.length; i++) {
+            ctx.lineTo(points[i].x, points[i].y);
+        }
+
+        if (points.length === 1) {
+            ctx.arc(points[0].x, points[0].y, width / 2, 0, 2 * Math.PI);
+            ctx.fill();
+        } else {
+            ctx.stroke();
+        }
+        ctx.globalCompositeOperation = "source-over";
+    }
+
+    // each layer is rendered on its own transparent canvas, then composited over white
     function redraw() {
-        context.fillStyle = CANVAS_BG;
-        context.fillRect(0, 0, canvas.width, canvas.height);
+        const layerContexts = {};
+        for (const key of ["bg", "fg"]) {
+            const lc = layerCanvases[key];
+            if (lc.width !== canvas.width || lc.height !== canvas.height) {
+                lc.width = canvas.width;
+                lc.height = canvas.height;
+            }
+            layerContexts[key] = lc.getContext("2d", { willReadFrequently: true });
+            layerContexts[key].clearRect(0, 0, lc.width, lc.height);
+        }
 
         artWrapper.actions.forEach((action) => {
-            const points = action.points;
-            const width = action.size || 5;
-
-            context.strokeStyle = action.color;
-            context.fillStyle = action.color;
-            context.lineJoin = "round";
-            context.lineCap = "round";
-            context.lineWidth = width;
-            context.beginPath();
-            context.moveTo(points[0].x, points[0].y);
-
-            for (let i = 1; i < points.length; i++) {
-                context.lineTo(points[i].x, points[i].y);
-            }
-
-            if (points.length === 1) {
-                context.arc(points[0].x, points[0].y, width / 2, 0, 2 * Math.PI);
-                context.fill();
-            } else {
-                context.stroke();
-            }
+            const ctx = layerContexts[action.layer === "bg" ? "bg" : "fg"];
+            if (action.type === "fill") floodFill(ctx, action.point.x, action.point.y, action.color);
+            else drawStroke(ctx, action);
         });
+
+        context.fillStyle = CANVAS_BG;
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(layerCanvases.bg, 0, 0);
+        context.drawImage(layerCanvases.fg, 0, 0);
     }
 
     function pointFromEvent(e) {
@@ -183,11 +299,20 @@ const createCanvas = () => {
             sampleColor(pointFromEvent(e));
             return;
         }
+        if (tool === "fill") {
+            artWrapper.addAction({ type: "fill", layer, color, point: pointFromEvent(e) });
+            redraw();
+            return;
+        }
         canvas.setPointerCapture(e.pointerId);
         paint = true;
+        const erase = tool === "eraser";
+        const size = sizes[layer];
         currentAction = {
-            color: tool === "eraser" ? CANVAS_BG : color,
-            size: tool === "eraser" ? Math.max(size * 2, 16) : size,
+            layer,
+            erase,
+            color: erase ? CANVAS_BG : color,
+            size: erase ? Math.max(size * 2, 16) : size,
             points: [],
         };
         artWrapper.addAction(currentAction);

@@ -8,7 +8,7 @@ class Wrapper
 
     addAction(action)
     {
-        if (!action || !Array.isArray(action.points)) {
+        if (!action || (action.type !== "fill" && !Array.isArray(action.points))) {
             throw new TypeError("action must contain a points array");
         }
 
