@@ -90,12 +90,32 @@ const createCanvas = () => {
             btn.setAttribute("aria-pressed", tool === name);
         });
         if (tool === "dropper") dropperStatus.textContent = "Click the canvas to sample a color.";
-        else if (dropperStatus.textContent.startsWith("Click")) dropperStatus.textContent = "";
+        else {
+            dropperStatus.textContent = "";
+            dropperStatus.style.borderBottom = "";
+        }
     }
     brushBtn.addEventListener("click", () => setTool("brush"));
     eraserBtn.addEventListener("click", () => setTool("eraser"));
-    // dropper toggles: click again to go back to the brush
-    dropperBtn.addEventListener("click", () => setTool(tool === "dropper" ? "brush" : "dropper"));
+    // dropper: uses the browser EyeDropper API (any pixel on screen); falls back to canvas-only sampling
+    dropperBtn.addEventListener("click", async () => {
+        if (!window.EyeDropper) {
+            setTool(tool === "dropper" ? "brush" : "dropper");
+            return;
+        }
+        try {
+            const { sRGBHex } = await new EyeDropper().open();
+            const n = parseInt(sRGBHex.slice(1), 16);
+            colorWheel.setRgbColor(n >> 16 & 255, n >> 8 & 255, n & 255);
+            dropperStatus.textContent = "Color sampled.";
+            dropperStatus.style.borderBottom = "";
+            setTimeout(() => {
+                if (dropperStatus.textContent === "Color sampled.") dropperStatus.textContent = "";
+            }, 2000);
+        } catch (err) {
+            // user pressed Escape; nothing to do
+        }
+    });
 
     // dropper: read the pixel under the pointer and load it into the color wheel
     function sampleColor(point) {
@@ -104,6 +124,7 @@ const createCanvas = () => {
         const pixel = context.getImageData(x, y, 1, 1).data;
         colorWheel.setRgbColor(pixel[0], pixel[1], pixel[2]); // also switches back to the brush
         dropperStatus.textContent = "Color sampled.";
+        dropperStatus.style.borderBottom = "";
         setTimeout(() => {
             if (dropperStatus.textContent === "Color sampled.") dropperStatus.textContent = "";
         }, 2000);
@@ -175,6 +196,15 @@ const createCanvas = () => {
     });
 
     canvas.addEventListener("pointermove", (e) => {
+        if (tool === "dropper") {
+            const p = pointFromEvent(e);
+            const px = context.getImageData(
+                Math.max(0, Math.min(canvas.width - 1, Math.floor(p.x))),
+                Math.max(0, Math.min(canvas.height - 1, Math.floor(p.y))), 1, 1).data;
+            dropperStatus.textContent = "Under cursor: rgb(" + px[0] + ", " + px[1] + ", " + px[2] + ")";
+            dropperStatus.style.borderBottom = "6px solid rgb(" + px[0] + "," + px[1] + "," + px[2] + ")";
+            return;
+        }
         if (!paint) return;
         currentAction.points.push(pointFromEvent(e));
         redraw();

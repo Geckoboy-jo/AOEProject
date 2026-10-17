@@ -129,8 +129,22 @@ html, body {
   cursor: crosshair;
 }
 
+#color-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#color-row .tool {
+  width: 36px;
+  height: 36px;
+  font-size: 18px;
+  flex: none;
+}
+
 #selected-color {
   display: block;
+  flex: 1;
   text-align: center;
   padding: 4px;
   font-family: monospace;
