@@ -135,7 +135,7 @@ body {
 .icon-button .icon {
   position: absolute;
   inset: 0;
-  background: var(--icon) center / 70% no-repeat;
+  background: var(--icon) center / 95% no-repeat;
   image-rendering: pixelated;
   pointer-events: none;
 }
