@@ -147,6 +147,7 @@ body[data-screen="draw"] #draw-footer { display: flex; }
 
 #round-bar,
 #results-title,
+#results-painting,
 #results-score,
 .results-pair figcaption,
 #screen-results > .credit,
@@ -221,3 +222,12 @@ body[data-screen="draw"] #draw-footer { display: flex; }
     grid-template-columns: 1fr;
   }
 }
+
+/* painting ambush reveal on the results screen */
+#results-painting {
+  margin: -8px 0 12px;
+  font-size: 16px;
+  text-align: center;
+}
+
+#results-painting a { color: inherit; }

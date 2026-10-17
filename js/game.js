@@ -10,12 +10,12 @@
 // Game.mode, Game.screen.
 
 const Game = (() => {
-  // Per-mode rules. Trick vs. Treat only changes the kind of image for now;
-  // timings are kept per mode so gimmicks can be added later. The start
-  // screen reads these too.
+  // Per-mode rules. The start screen reads these too.
+  // paintingChance: odds a Trick round ambushes you with a famous painting
+  // (assets/paintings) instead of a normal image.
   const MODES = {
-    treat: { name: "Treat", blurb: "Spooky images", viewSeconds: 6, drawSeconds: 60 },
-    trick: { name: "Trick", blurb: "Cheeky images", viewSeconds: 6, drawSeconds: 60 },
+    treat: { name: "Treat", blurb: "Spooky images", viewSeconds: 6, drawSeconds: 60, paintingChance: 0 },
+    trick: { name: "Trick", blurb: "Cheeky images", viewSeconds: 6, drawSeconds: 60, paintingChance: 1 / 3 },
   };
 
   const $ = (id) => document.getElementById(id);
@@ -98,6 +98,9 @@ const Game = (() => {
     if (!item || !item.credit) return "";
     const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
     const c = item.credit;
+    if (c.publicDomain) {
+      return `Public domain, via <a href="${esc(c.siteLink)}" target="_blank" rel="noopener">${esc(c.site)}</a>`;
+    }
     const site = c.site || "Unsplash";
     return `Image by <a href="${esc(c.link)}" target="_blank" rel="noopener">${esc(c.name)}</a>
       on <a href="${esc(c.siteLink || c.unsplash || "#")}" target="_blank" rel="noopener">${esc(site)}</a>`;
@@ -127,7 +130,7 @@ const Game = (() => {
     document.querySelectorAll(".mode-btn").forEach((b) => (b.disabled = true));
 
     try {
-      current = await ImageApi.next(mode);
+      current = await ImageApi.next(mode, { paintingChance: MODES[mode].paintingChance });
     } catch (err) {
       console.error(err);
       busy = false;
@@ -163,7 +166,26 @@ const Game = (() => {
     stopTimer();
     timerEl.textContent = "";
     const canvas = $("canvas");
-    $("results-title").textContent = timedOut ? "Time's up!" : "Pencils down!";
+    $("results-title").textContent = current.painting
+      ? "Trick! That was a masterpiece."
+      : timedOut
+        ? "Time's up!"
+        : "Pencils down!";
+    const reveal = $("results-painting");
+    if (reveal) {
+      reveal.hidden = !current.painting;
+      if (current.painting) {
+        const p = current.painting;
+        const link = document.createElement("a");
+        link.href = p.article;
+        link.target = "_blank";
+        link.rel = "noopener";
+        const title = document.createElement("i");
+        title.textContent = p.title;
+        link.append(title);
+        reveal.replaceChildren("You just tried to draw ", link, `, ${p.artist}, ${p.year}.`);
+      }
+    }
     $("results-drawing").src = canvas ? canvas.toDataURL("image/png") : "";
     $("results-original").src = current.src;
     $("results-original").alt = current.alt;

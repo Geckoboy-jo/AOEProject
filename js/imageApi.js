@@ -194,9 +194,44 @@ const ImageApi = (() => {
     return refilling[category];
   }
 
+  // ---- painting ambush (Trick only): famous, public-domain, undrawable ----
+  // List comes from assets/paintings/cache.js (scripts/build-paintings.js).
+  const paintings = () => (Array.isArray(window.PAINTINGS) ? window.PAINTINGS : []);
+  let paintingDeck = [];
+
+  function nextPainting() {
+    const all = paintings();
+    if (!all.length) return null;
+    if (paintingDeck.length === 0) {
+      paintingDeck = [...all];
+      for (let i = paintingDeck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [paintingDeck[i], paintingDeck[j]] = [paintingDeck[j], paintingDeck[i]];
+      }
+    }
+    const p = paintingDeck.pop();
+    return preload({
+      src: p.file,
+      alt: `${p.title} by ${p.artist}`,
+      prompt: p.title,
+      category: "trick",
+      painting: { title: p.title, artist: p.artist, year: p.year, article: p.article },
+      credit: { name: p.artist, link: p.article, site: "Wikimedia Commons", siteLink: p.commons, publicDomain: true },
+      source: "painting",
+    });
+  }
+
   // category: "treat", "trick", or "either" (default)
-  async function next(category = "either") {
+  // opts.paintingChance: odds (0-1) that a Trick round is a famous painting instead
+  async function next(category = "either", opts = {}) {
     const c = resolve(category);
+    if (c === "trick" && opts.paintingChance > 0 && Math.random() < opts.paintingChance) {
+      const painting = nextPainting();
+      if (painting) {
+        await painting.ready;
+        return painting;
+      }
+    }
     if (!queues[c] || queues[c].length === 0) await refill(c);
     const item = queues[c].shift();
     if (queues[c].length <= REFILL_AT) refill(c); // top up in the background
@@ -213,7 +248,7 @@ const ImageApi = (() => {
   console.info(
     `[ImageApi] image source: ${source()} (` +
       CATEGORIES.map((c) => `${cachedPhotos(c).length} ${c}`).join(", ") +
-      " cached)"
+      ` cached, ${paintings().length} paintings)`
   );
 
   return { next, refill, source, categories: CATEGORIES };
