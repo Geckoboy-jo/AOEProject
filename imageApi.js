@@ -7,55 +7,76 @@
 //   3. built-in emoji images, so the demo never breaks
 // Set APP_CONFIG.PREFER_LIVE_API = true in config.js to skip the cache.
 //
-// Usage:  const img = await ImageApi.next();
-//         img = { src, alt, prompt, credit: { name, link } | null, source }
+// Categories: "treat" (spooky), "trick" (cheeky), or "either".
+//   const img = await ImageApi.next("trick");
+//
+// Usage:  const img = await ImageApi.next("treat");
+//         img = { src, alt, prompt, category, credit: { name, link } | null, source }
 
 const ImageApi = (() => {
   // Search terms live in queries.js (shared with the cache builder).
   const QUERIES =
-    typeof IMAGE_QUERIES !== "undefined" ? IMAGE_QUERIES : ["halloween illustration"];
+    typeof IMAGE_QUERIES !== "undefined"
+      ? IMAGE_QUERIES
+      : { treat: ["halloween illustration"], trick: ["funny animal"] };
+  const CATEGORIES = Object.keys(QUERIES);
 
   const BATCH_SIZE = 10;   // images per API call (Unsplash max is 30)
   const REFILL_AT = 3;     // fetch more when this many are left
   const UTM = "utm_source=aoe_hackathon_drawing_game&utm_medium=referral";
 
   // Offline / no-key fallback: emoji drawn into SVG data URLs.
-  const FALLBACK = [
-    ["🎃", "pumpkin"], ["👻", "ghost"], ["🦇", "bat"], ["🕷️", "spider"],
-    ["💀", "skull"], ["🧙", "witch"], ["🍬", "candy"], ["🧛", "vampire"],
-    ["🕸️", "spider web"], ["🧟", "zombie"], ["🐈‍⬛", "black cat"],
-    ["🦉", "owl"], ["🍭", "lollipop"], ["🌕", "full moon"], ["🪦", "gravestone"],
-    ["🐸", "frog"], ["🦆", "duck"], ["🌮", "taco"], ["🌵", "cactus"],
-  ];
+  const FALLBACK = {
+    treat: [
+      ["🎃", "pumpkin"], ["👻", "ghost"], ["🦇", "bat"], ["🕷️", "spider"],
+      ["💀", "skull"], ["🧙", "witch"], ["🍬", "candy"], ["🧛", "vampire"],
+      ["🕸️", "spider web"], ["🧟", "zombie"], ["🐈‍⬛", "black cat"],
+      ["🦉", "owl"], ["🍭", "lollipop"], ["🌕", "full moon"], ["🪦", "gravestone"],
+    ],
+    trick: [
+      ["🐸", "frog"], ["🦆", "duck"], ["🌮", "taco"], ["🌵", "cactus"],
+      ["🍕", "pizza"], ["🦖", "dinosaur"], ["🐙", "octopus"], ["🚽", "toilet"],
+      ["🥒", "pickle"], ["🦩", "flamingo"], ["🧀", "cheese"], ["🐌", "snail"],
+    ],
+  };
 
-  let queue = [];
-  let refilling = null;
+  // one queue / refill / cache deck per category
+  const queues = {};
+  const refilling = {};
+  const cacheDecks = {};
   let unsplashDisabled = false;
-  let cacheDeck = [];
 
-  const cachedPhotos = () =>
+  // which category a cached photo belongs to (older caches have no category field)
+  const queryCategory = {};
+  CATEGORIES.forEach((c) => QUERIES[c].forEach((q) => (queryCategory[q] = c)));
+
+  const allCachedPhotos = () =>
     (window.IMAGE_CACHE && Array.isArray(window.IMAGE_CACHE.photos) && window.IMAGE_CACHE.photos) || [];
+  const cachedPhotos = (category) =>
+    allCachedPhotos().filter((p) => (p.category || queryCategory[p.prompt]) === category);
 
   const preferLive = () => !!(window.APP_CONFIG && window.APP_CONFIG.PREFER_LIVE_API);
 
   // Deal from a shuffled deck so you don't see repeats until the whole cache is used.
-  function cachedBatch() {
-    const photos = cachedPhotos();
+  function cachedBatch(category) {
+    const photos = cachedPhotos(category);
     const out = [];
     while (out.length < Math.min(BATCH_SIZE, photos.length)) {
-      if (cacheDeck.length === 0) {
-        cacheDeck = [...photos];
-        for (let i = cacheDeck.length - 1; i > 0; i--) {
+      let deck = cacheDecks[category];
+      if (!deck || deck.length === 0) {
+        deck = cacheDecks[category] = [...photos];
+        for (let i = deck.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
-          [cacheDeck[i], cacheDeck[j]] = [cacheDeck[j], cacheDeck[i]];
+          [deck[i], deck[j]] = [deck[j], deck[i]];
         }
       }
-      const p = cacheDeck.pop();
+      const p = deck.pop();
       out.push({
         src: p.file || p.src,
         remoteSrc: p.src,
         alt: p.alt,
         prompt: p.prompt,
+        category,
         credit: { name: p.credit.name, link: p.credit.link, unsplash: `https://unsplash.com/?${UTM}` },
         source: "cache",
       });
@@ -68,7 +89,10 @@ const ImageApi = (() => {
 
   const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-  function emojiImage([emoji, name]) {
+  const resolve = (category) =>
+    CATEGORIES.includes(category) ? category : pick(CATEGORIES); // "either" -> random
+
+  function emojiImage([emoji, name], category) {
     const svg =
       `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400">` +
       `<rect width="100%" height="100%" fill="#fff"/>` +
@@ -77,13 +101,14 @@ const ImageApi = (() => {
       src: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg),
       alt: name,
       prompt: name,
+      category,
       credit: null,
       source: "fallback",
     };
   }
 
-  async function fetchUnsplashBatch() {
-    const query = pick(QUERIES);
+  async function fetchUnsplashBatch(category) {
+    const query = pick(QUERIES[category]);
     const params = new URLSearchParams({
       query,
       count: String(BATCH_SIZE),
@@ -108,6 +133,7 @@ const ImageApi = (() => {
       src: p.urls.regular,
       alt: p.alt_description || query,
       prompt: query,
+      category,
       credit: {
         name: p.user.name,
         link: `${p.user.links.html}?${UTM}`,
@@ -134,43 +160,53 @@ const ImageApi = (() => {
     return item;
   }
 
-  function refill() {
-    if (refilling) return refilling;
-    refilling = (async () => {
+  function refill(category) {
+    if (refilling[category]) return refilling[category];
+    refilling[category] = (async () => {
       let items;
-      const haveCache = cachedPhotos().length > 0;
+      const haveCache = cachedPhotos(category).length > 0;
       if (haveCache && !preferLive()) {
-        items = cachedBatch();
+        items = cachedBatch(category);
       } else if (accessKey() && !unsplashDisabled) {
         try {
-          items = await fetchUnsplashBatch();
+          items = await fetchUnsplashBatch(category);
         } catch (err) {
           console.warn("[ImageApi] live API failed:", err.message);
-          if (haveCache) items = cachedBatch();
+          if (haveCache) items = cachedBatch(category);
         }
       }
       if (!items || items.length === 0) {
-        items = [...FALLBACK].sort(() => Math.random() - 0.5).slice(0, BATCH_SIZE).map(emojiImage);
+        items = [...FALLBACK[category]]
+          .sort(() => Math.random() - 0.5)
+          .slice(0, BATCH_SIZE)
+          .map((e) => emojiImage(e, category));
       }
-      queue.push(...items.map(preload));
-    })().finally(() => (refilling = null));
-    return refilling;
+      (queues[category] = queues[category] || []).push(...items.map(preload));
+    })().finally(() => (refilling[category] = null));
+    return refilling[category];
   }
 
-  async function next() {
-    if (queue.length === 0) await refill();
-    const item = queue.shift();
-    if (queue.length <= REFILL_AT) refill(); // top up in the background
+  // category: "treat", "trick", or "either" (default)
+  async function next(category = "either") {
+    const c = resolve(category);
+    if (!queues[c] || queues[c].length === 0) await refill(c);
+    const item = queues[c].shift();
+    if (queues[c].length <= REFILL_AT) refill(c); // top up in the background
     await item.ready; // don't start the 3s timer until it's actually on screen
     return item;
   }
 
-  // Warm the queue on page load so the first round is instant.
-  refill();
+  // Warm every category on page load so the first round is instant.
+  // (With no cache this costs one live API call per category.)
+  CATEGORIES.forEach((c) => refill(c));
 
   const source = () =>
-    cachedPhotos().length && !preferLive() ? "cache" : accessKey() && !unsplashDisabled ? "live" : "emoji";
-  console.info(`[ImageApi] image source: ${source()} (${cachedPhotos().length} cached photos)`);
+    allCachedPhotos().length && !preferLive() ? "cache" : accessKey() && !unsplashDisabled ? "live" : "emoji";
+  console.info(
+    `[ImageApi] image source: ${source()} (` +
+      CATEGORIES.map((c) => `${cachedPhotos(c).length} ${c}`).join(", ") +
+      " cached)"
+  );
 
-  return { next, refill, source };
+  return { next, refill, source, categories: CATEGORIES };
 })();

@@ -89,7 +89,10 @@ async function main() {
     process.exit(1);
   }
 
-  const queries = require(path.join(ROOT, "queries.js"));
+  const groups = require(path.join(ROOT, "queries.js"));
+  const queries = Object.entries(groups).flatMap(([category, list]) =>
+    list.map((query) => ({ category, query }))
+  );
   const fresh = process.argv.includes("--fresh");
   const existing = fresh ? undefined : loadBrowserScript(OUT, "IMAGE_CACHE");
   const byId = new Map((existing?.photos || []).map((p) => [p.id, p]));
@@ -98,7 +101,7 @@ async function main() {
   console.log(`Fetching ${queries.length} queries x ${PER_QUERY} photos (${queries.length} API requests)...`);
   let remaining = "?";
 
-  for (const query of queries) {
+  for (const { category, query } of queries) {
     const params = new URLSearchParams({
       query,
       count: String(PER_QUERY),
@@ -119,7 +122,7 @@ async function main() {
     const photos = await res.json();
     let added = 0;
     for (const p of photos) {
-      if (byId.has(p.id)) continue;
+      if (byId.has(p.id)) continue; // first category to find a photo keeps it
       byId.set(p.id, {
         id: p.id,
         file: `assets/unsplash/${p.id}.jpg`,
@@ -127,11 +130,12 @@ async function main() {
         raw: p.urls.raw,
         alt: p.alt_description || query,
         prompt: query,
+        category,
         credit: { name: p.user.name, link: `${p.user.links.html}?${UTM}` },
       });
       added++;
     }
-    console.log(`  ${query}: +${added}  (rate limit left: ${remaining})`);
+    console.log(`  [${category}] ${query}: +${added}  (rate limit left: ${remaining})`);
     if (Number(remaining) <= 1) {
       console.warn("Out of requests for this hour; saving what we have.");
       break;
