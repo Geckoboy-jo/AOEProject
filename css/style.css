@@ -117,7 +117,7 @@ body {
 
 /* icon buttons: one shared background image + a separate icon image per button */
 :root {
-  --icon-button-bg: url("../assets/ui/ui-button.png");
+  --icon-button-bg: url("../assets/ui/ui-button-square.png");
 }
 
 .icon-button {
@@ -142,10 +142,10 @@ body {
 
 .icon-back     { --icon: url("../assets/ui/icon-back.png"); }
 .icon-clear    { --icon: url("../assets/ui/icon-clear.png"); }
-.icon-erase    { --icon: url("../assets/ui/icon-erase.png"); }
+.icon-erase    { --icon: url("../assets/ui/ui-icon-eraser.png"); }
 .icon-settings { --icon: url("../assets/ui/icon-settings.png"); }
-.icon-pencil   { --icon: url("../assets/ui/icon-pencil.png"); }
-.icon-bucket   { --icon: url("../assets/ui/icon-bucket.png"); }
+.icon-pencil   { --icon: url("../assets/ui/ui-icon-pen.png"); }
+.icon-bucket   { --icon: url("../assets/ui/ui-icon-paintbucket.png"); }
 
 #save-status { font-size: 11px; text-align: center; }
 
