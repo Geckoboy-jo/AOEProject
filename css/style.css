@@ -27,13 +27,19 @@ body {
   image-rendering: pixelated;
 }
 
+/* Logo is 127x41 pixel art. Same size on every screen; only shrinks on
+   short windows, in whole-number steps so every pixel stays the same size. */
 .logo {
   display: block;
-  height: 210px;
+  height: 123px; /* 3x */
   width: auto;
   image-rendering: pixelated;
   max-width: 100%;
   margin: 0 auto;
+}
+
+@media (max-height: 800px) {
+  .logo { height: 82px; } /* 2x */
 }
 
 #toolbar, #color-picker-panel {
@@ -100,9 +106,10 @@ body {
 }
 
 .tool {
-  width: 48px;
-  height: 48px;
-  font-size: 22px;
+  min-width: 56px;
+  height: 36px;
+  padding: 0 8px;
+  font-size: 13px;
   cursor: pointer;
 }
 
@@ -116,6 +123,7 @@ body {
 .icon-button {
   position: relative;
   width: 48px;
+  min-width: 0; /* stay square even when it's also a .tool */
   height: 48px;
   padding: 0;
   border: 0;
@@ -166,6 +174,26 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 8px;
+}
+
+/* live brush preview under the size slider (holds up to the 60px eraser) */
+#brush-preview-box {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+}
+
+#brush-preview {
+  display: block;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+#brush-preview.eraser {
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+  outline: 1px dashed rgba(0, 0, 0, 0.5);
+  outline-offset: 2px;
 }
 
 #brush-size {
@@ -301,38 +329,89 @@ body {
   cursor: pointer;
 }
 
-/* ---- settings popup ---- */
-#outer-popup {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  background: rgba(0, 0, 0, 0.5);
+/* ---- settings dialog + how-to-play steps (start screen) ---- */
+#settings-dialog {
+  width: min(420px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding: 24px;
+  border: 0;
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
 }
 
-#onstart-popup {
-  position: fixed;
-  z-index: 201;
-  top: 60px;
-  left: 0;
-  right: 0;
-  width: 90%;
-  max-width: 400px;
-  margin: auto;
-  padding: 10px 20px 20px;
-  background: white;
+#settings-dialog::backdrop {
+  background: rgba(10, 5, 20, 0.6);
 }
 
-#onstart-popup .setting {
-  display: block;
-  margin: 12px 0;
-}
-
-.popup-x {
+.htp-close {
   position: absolute;
-  top: 5px;
-  right: 10px;
-  font-size: 1.5em;
+  top: 10px;
+  right: 12px;
+  border: 0;
+  background: none;
+  font-size: 26px;
+  line-height: 1;
   cursor: pointer;
+}
+
+
+.htp-steps {
+  list-style: none;
+  counter-reset: step;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 0 0 14px;
+  padding: 0;
+}
+
+.htp-steps li {
+  counter-increment: step;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 12px 12px 14px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.htp-steps li::before {
+  content: counter(step);
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-weight: bold;
+  opacity: 0.35;
+}
+
+.htp-tips { margin-bottom: 16px; font-size: 14px; }
+
+.settings-actions button { padding: 6px 14px; cursor: pointer; }
+
+#settings-dialog .setting {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 12px 0 18px;
+}
+
+.settings-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.htp-tips summary { cursor: pointer; font-weight: bold; }
+.htp-tips ul { margin: 8px 0 0; padding-left: 20px; }
+
+
+
+
+
+@media (max-width: 480px) {
+  .htp-steps { grid-template-columns: 1fr; }
 }
 
 /* ---- narrow screens: stack tools / canvas / colors ---- */

@@ -1,192 +1,251 @@
-// game.js — round flow: pick Trick or Treat, flash a random image for 3s,
-// draw it before the timer runs out, then reveal it next to your drawing.
+// game.js: the screen flow.
 //
-// Hooks for other UI: Game.startRound("trick" | "treat" | "either"),
-// Game.showReveal(), Game.category (the last one picked).
+//   start  -> pick Treat or Trick
+//   preview -> memorize the image (look-time countdown in the header)
+//   draw   -> draw it before the timer runs out (or hit Done)
+//   results -> yours vs. original, save / share / play again
+//
+// body[data-screen] says which screen is showing; css/style.css does the rest.
+// Hooks for other UI: Game.start("treat" | "trick"), Game.finish(), Game.toStart(),
+// Game.mode, Game.screen.
 
 const Game = (() => {
-  const SHOW_MS = 3000;
-  const DEFAULT_ROUND_SECONDS = 300;
+  // Per-mode rules. Trick vs. Treat only changes the kind of image for now;
+  // timings are kept per mode so gimmicks can be added later. The start
+  // screen reads these too.
+  const MODES = {
+    treat: { name: "Treat", blurb: "Spooky images", viewSeconds: 6, drawSeconds: 60 },
+    trick: { name: "Trick", blurb: "Cheeky images", viewSeconds: 6, drawSeconds: 60 },
+  };
 
-  // ---- build UI ----
+  const $ = (id) => document.getElementById(id);
+  const timerEl = $("round-timer");
+  const lengthSelect = $("round-length");
+
+  // header controls during the draw screen
   const bar = document.createElement("div");
   bar.id = "round-bar";
   bar.innerHTML = `
-    <span id="round-status">Trick or treat? 🎃</span>
-    <button id="round-trick" class="round-start" data-category="trick" type="button" title="Cheeky curveball images">🎭 Trick</button>
-    <button id="round-treat" class="round-start" data-category="treat" type="button" title="Spooky Halloween images">🍬 Treat</button>
-    <button id="reveal" type="button" disabled>Reveal</button>`;
-
-  const flash = document.createElement("div");
-  flash.id = "flash-overlay";
-  flash.hidden = true;
-  flash.innerHTML = `
-    <div class="flash-card">
-      <div id="flash-countdown"></div>
-      <img id="flash-img" alt="" />
-      <p class="credit" id="flash-credit"></p>
-    </div>`;
-
-  const reveal = document.createElement("div");
-  reveal.id = "reveal-overlay";
-  reveal.hidden = true;
-  reveal.innerHTML = `
-    <div class="reveal-card">
-      <h2 id="reveal-title">Trick or treat? 👻</h2>
-      <div class="reveal-pair">
-        <figure><img id="reveal-original" alt="" /><figcaption id="reveal-prompt">The real thing</figcaption></figure>
-        <figure><img id="reveal-drawing" alt="your drawing" /><figcaption>Your masterpiece</figcaption></figure>
-      </div>
-      <p class="credit" id="reveal-credit"></p>
-      <div class="reveal-actions">
-        <button id="reveal-close" type="button">Keep drawing</button>
-        <button id="reveal-next" type="button">Next round</button>
-      </div>
-    </div>`;
-
-  // controls go in the header slot if the page has one, otherwise float
-  (document.getElementById("round-slot") || document.body).append(bar);
-  document.body.append(flash, reveal);
-
-  const $ = (id) => document.getElementById(id);
+    <span id="round-status"></span>
+    <button id="round-done" type="button">Done</button>`;
+  ($("round-slot") || document.body).append(bar);
   const statusEl = $("round-status");
-  const startBtns = [...bar.querySelectorAll(".round-start")];
-  const setStartDisabled = (d) => startBtns.forEach((b) => (b.disabled = d));
-  const revealBtn = $("reveal");
-  const timerEl = $("round-timer"); // optional, lives in the header
-  const lengthSelect = $("round-length"); // optional, lives in settings
 
-  let current = null;
-  let category = "either";
+  let screen = "start";
+  let mode = "treat";
+  let current = null; // the image for this round
+  let timer = null;
   let busy = false;
-  let drawTimer = null;
-  let deadline = 0;
 
-  const roundSeconds = () =>
-    Number(lengthSelect && lengthSelect.value) || DEFAULT_ROUND_SECONDS;
-
+  // ---------- helpers ----------
   function fmt(sec) {
     const s = Math.max(0, Math.ceil(sec));
     return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
   }
 
-  function showTime(sec) {
-    if (!timerEl) return;
-    timerEl.textContent = fmt(sec);
-    timerEl.classList.toggle("urgent", sec <= 10 && sec > 0);
+  function drawSeconds() {
+    const v = lengthSelect && lengthSelect.value;
+    return v && v !== "auto" ? Number(v) : MODES[mode].drawSeconds;
   }
 
-  function stopDrawTimer() {
-    clearInterval(drawTimer);
-    drawTimer = null;
-    if (timerEl) timerEl.classList.remove("urgent");
+  function setScreen(next) {
+    screen = next;
+    document.body.dataset.screen = next;
+    syncHeader(); // the logo changes size per screen
+    // the canvas was laid out while hidden; nudge it to re-fit
+    if (next === "draw") window.dispatchEvent(new Event("resize"));
   }
 
-  function startDrawTimer() {
-    stopDrawTimer();
-    deadline = Date.now() + roundSeconds() * 1000;
+  function stopTimer() {
+    clearInterval(timer);
+    timer = null;
+    timerEl.classList.remove("urgent");
+  }
+
+  // counts down `seconds` in the header, then calls onDone
+  function countdown(seconds, onDone, urgentAt = 10) {
+    stopTimer();
+    const end = Date.now() + seconds * 1000;
     const tick = () => {
-      const left = (deadline - Date.now()) / 1000;
-      showTime(left);
+      const left = (end - Date.now()) / 1000;
+      timerEl.textContent = fmt(left);
+      timerEl.classList.toggle("urgent", left <= urgentAt && left > 0);
       if (left <= 0) {
-        stopDrawTimer();
-        statusEl.textContent = "Time's up! 💀";
-        showReveal(true);
+        stopTimer();
+        onDone();
       }
     };
     tick();
-    drawTimer = setInterval(tick, 250);
+    timer = setInterval(tick, 200);
   }
-
-  if (lengthSelect) {
-    lengthSelect.addEventListener("change", () => {
-      if (!drawTimer) showTime(roundSeconds());
-    });
-  }
-  showTime(roundSeconds());
 
   function creditHTML(item) {
-    if (!item.credit) return "";
-    return `Photo by <a href="${item.credit.link}" target="_blank" rel="noopener">${item.credit.name}</a>
-      on <a href="${item.credit.unsplash}" target="_blank" rel="noopener">Unsplash</a>`;
+    if (!item || !item.credit) return "";
+    const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+    return `Photo by <a href="${esc(item.credit.link)}" target="_blank" rel="noopener">${esc(item.credit.name)}</a>
+      on <a href="${esc(item.credit.unsplash)}" target="_blank" rel="noopener">Unsplash</a>`;
   }
 
-  async function startRound(pickedCategory = category) {
+  // ---------- 1) start ----------
+  document.querySelectorAll("[data-mode-desc]").forEach((el) => {
+    const m = MODES[el.dataset.modeDesc];
+    el.textContent = `${m.blurb} · ${m.viewSeconds}s look · ${fmt(m.drawSeconds)} to draw`;
+  });
+  document.querySelectorAll(".mode-btn").forEach((btn) =>
+    btn.addEventListener("click", () => start(btn.dataset.mode))
+  );
+
+  function toStart() {
+    stopTimer();
+    busy = false;
+    timerEl.textContent = "";
+    setScreen("start");
+  }
+
+  // ---------- 2) preview ----------
+  async function start(pickedMode = mode) {
     if (busy) return;
     busy = true;
-    category = pickedCategory;
-    startBtns.forEach((b) => b.classList.toggle("active", b.dataset.category === category));
-    stopDrawTimer();
-    showTime(roundSeconds());
-    reveal.hidden = true;
-    setStartDisabled(true);
-    revealBtn.disabled = true;
-    statusEl.textContent = category === "trick" ? "Conjuring a trick… 🎭" : category === "treat" ? "Unwrapping a treat… 🍬" : "Summoning… 🔮";
+    mode = MODES[pickedMode] ? pickedMode : "treat";
+    document.querySelectorAll(".mode-btn").forEach((b) => (b.disabled = true));
 
     try {
-      current = await ImageApi.next(category);
+      current = await ImageApi.next(mode);
     } catch (err) {
       console.error(err);
-      statusEl.textContent = "No image. Try again?";
-      setStartDisabled(false);
       busy = false;
+      document.querySelectorAll(".mode-btn").forEach((b) => (b.disabled = false));
       return;
     }
+    document.querySelectorAll(".mode-btn").forEach((b) => (b.disabled = false));
 
-    // wipe the canvas for the new round (reuses the app's CLEAR logic)
+    // fresh canvas for the new round (reuses the app's Clear logic)
     const clearBtn = $("clear");
     if (clearBtn) clearBtn.click();
 
-    $("flash-img").src = current.src;
-    $("flash-img").alt = current.alt;
-    $("flash-credit").innerHTML = creditHTML(current);
-    flash.hidden = false;
+    $("preview-img").src = current.src;
+    $("preview-img").alt = current.alt;
+    $("preview-draw-time").textContent = fmt(drawSeconds());
+    $("preview-credit").innerHTML = creditHTML(current);
+    setScreen("preview");
 
-    // countdown 3..2..1
-    const countdown = $("flash-countdown");
-    const end = Date.now() + SHOW_MS;
-    const tick = () => {
-      const left = Math.ceil((end - Date.now()) / 1000);
-      countdown.textContent = left > 0 ? left : "";
-    };
-    tick();
-    const timer = setInterval(tick, 100);
-
-    setTimeout(() => {
-      clearInterval(timer);
-      flash.hidden = true;
-      statusEl.textContent = "Draw it! ✏️";
-      setStartDisabled(false);
-      revealBtn.disabled = false;
-      busy = false;
-      startDrawTimer();
-    }, SHOW_MS);
+    countdown(MODES[mode].viewSeconds, startDrawing, 0);
   }
 
-  function showReveal(timedOut = false) {
-    if (!current) return;
-    stopDrawTimer();
+  // ---------- 3) draw ----------
+  function startDrawing() {
+    busy = false;
+    setScreen("draw");
+    statusEl.textContent = "Draw it from memory";
+    countdown(drawSeconds(), () => finish(true));
+  }
+
+  // ---------- 4) results ----------
+  function finish(timedOut = false) {
+    if (!current || screen !== "draw") return;
+    stopTimer();
+    timerEl.textContent = "";
     const canvas = $("canvas");
-    const label = current.category === "trick" ? "It was a trick! 🎭" : "Here's your treat! 🍬";
-    $("reveal-title").textContent = timedOut ? `Time's up! ${label}` : label;
-    $("reveal-original").src = current.src;
-    $("reveal-original").alt = current.alt;
-    $("reveal-prompt").textContent = `The real thing (${current.prompt})`;
-    $("reveal-drawing").src = canvas ? canvas.toDataURL("image/png") : "";
-    $("reveal-credit").innerHTML = creditHTML(current);
-    reveal.hidden = false;
+    $("results-title").textContent = timedOut ? "Time's up!" : "Pencils down!";
+    $("results-drawing").src = canvas ? canvas.toDataURL("image/png") : "";
+    $("results-original").src = current.src;
+    $("results-original").alt = current.alt;
+    $("results-credit").innerHTML = creditHTML(current);
+    $("results-status").textContent = "";
+    setScreen("results");
   }
 
-  startBtns.forEach((b) => b.addEventListener("click", () => startRound(b.dataset.category)));
-  revealBtn.addEventListener("click", () => showReveal(false));
-  $("reveal-next").addEventListener("click", () => startRound());
-  $("reveal-close").addEventListener("click", () => (reveal.hidden = true));
+  $("round-done").addEventListener("click", () => finish(false));
+
+  async function drawingBlob() {
+    return new Promise((resolve) => $("canvas").toBlob(resolve, "image/png"));
+  }
+
+  $("results-save").addEventListener("click", async () => {
+    const status = $("results-status");
+    try {
+      const result = await ExportManager.saveCanvasAsPng($("canvas"), "ghoulle-drawing.png");
+      status.textContent = result.saved ? "Saved." : "Save cancelled.";
+    } catch (err) {
+      console.error(err);
+      status.textContent = "Couldn't save the image.";
+    }
+  });
+
+  // Share: native share sheet with the image if the browser supports it,
+  // otherwise copy the image to the clipboard, otherwise save it.
+  $("results-share").addEventListener("click", async () => {
+    const status = $("results-status");
+    const blob = await drawingBlob();
+    const file = new File([blob], "ghoulle-drawing.png", { type: "image/png" });
+    const text = `I drew this from memory in Ghoulle. It was supposed to be: ${current ? current.prompt : "something spooky"}.`;
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], text, title: "Ghoulle" });
+        status.textContent = "";
+        return;
+      } catch (err) {
+        if (err && err.name === "AbortError") return; // closed the share sheet
+        console.warn("share failed, trying clipboard", err);
+      }
+    }
+    if (navigator.clipboard && window.ClipboardItem) {
+      try {
+        await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+        status.textContent = "Drawing copied to the clipboard.";
+        return;
+      } catch (err) {
+        console.warn("clipboard failed, saving instead", err);
+      }
+    }
+    try {
+      const result = await ExportManager.saveCanvasAsPng($("canvas"), "ghoulle-drawing.png");
+      status.textContent = result.saved ? "Sharing isn't available here, so it was saved instead." : "Save cancelled.";
+    } catch (err) {
+      console.error(err);
+      status.textContent = "Couldn't share or save the image.";
+    }
+  });
+
+  $("results-again").addEventListener("click", toStart);
+
+  // ---------- settings dialog ----------
+  const settings = $("settings-dialog");
+  if (settings) {
+    settings.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", () => settings.close()));
+    $("settings-quit").addEventListener("click", () => {
+      settings.close();
+      toStart();
+    });
+    settings.addEventListener("click", (e) => {
+      if (e.target !== settings) return;
+      const r = settings.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) settings.close();
+    });
+  }
+
+  // the header's height depends on the logo; screens size themselves from it
+  function syncHeader() {
+    const header = document.getElementById("top-bar");
+    if (header) document.documentElement.style.setProperty("--header-h", `${header.offsetHeight}px`);
+  }
+  window.addEventListener("resize", syncHeader);
+  window.addEventListener("load", syncHeader);
+  syncHeader();
+
+  setScreen("start");
 
   return {
-    startRound,
-    showReveal,
-    get category() {
-      return category;
+    start,
+    finish,
+    toStart,
+    modes: MODES,
+    get mode() {
+      return mode;
+    },
+    get screen() {
+      return screen;
     },
   };
 })();
