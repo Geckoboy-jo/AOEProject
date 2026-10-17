@@ -184,7 +184,6 @@ body {
   --icon-button-bg: url("../assets/ui/ui-button-1x1.png");
 }
 
-#dropper,
 .htp-close,
 #layer-toggle button,
 #round-bar button,
@@ -200,14 +199,8 @@ body {
   image-rendering: pixelated;
 }
 
-#dropper {
-  min-width: 0;
-  padding: 0;
-}
-
 .mode-btn { --bw: 6px; }
 
-#dropper,
 .htp-close { --btn-art: var(--btn-1x1); }
 #layer-toggle button,
 #round-bar button,
@@ -246,6 +239,7 @@ body {
 .icon-settings { --icon: url("../assets/ui/ui-icon-cog.png"); }
 .icon-pencil   { --icon: url("../assets/ui/ui-icon-pen.png"); }
 .icon-bucket   { --icon: url("../assets/ui/ui-icon-paintbucket.png"); }
+.icon-dropper  { --icon: url("../assets/ui/ui-icon-eyedropper.png"); }
 
 #save-status {
   font-size: 16px;
@@ -333,9 +327,6 @@ body {
 }
 
 #color-row .tool {
-  width: 32px;
-  height: 32px;
-  font-size: 16px;
   flex: none;
 }
 
