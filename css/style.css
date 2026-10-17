@@ -178,7 +178,7 @@ body {
 
 /* icon buttons: one shared background image + a separate icon image per button */
 :root {
-  --icon-button-bg: url("../assets/ui/ui-button-square.png");
+  --icon-button-bg: url("../assets/ui/ui-button-1x1.png");
 }
 
 .icon-button {
