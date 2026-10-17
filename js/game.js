@@ -224,6 +224,14 @@ const Game = (() => {
     });
   }
 
+  // the header's height depends on the logo; screens size themselves from it
+  const header = document.getElementById("top-bar");
+  const syncHeader = () =>
+    header && document.documentElement.style.setProperty("--header-h", `${header.offsetHeight}px`);
+  window.addEventListener("resize", syncHeader);
+  window.addEventListener("load", syncHeader);
+  syncHeader();
+
   setScreen("start");
 
   return {
