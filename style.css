@@ -1,0 +1,247 @@
+/* style.css: layout skeleton only (matches the whiteboard sketch).
+   No theme yet; colors, fonts and visuals get layered on later.
+
+   +--------------------------------------------------+
+   | [gear]        GHOULLE banner / 5:00     [round]  |  header
+   +------+---------------------------------+---------+
+   | undo |                                 | brush/  |
+   | clear|            canvas               | eraser/ |
+   |      |                                 | dropper |
+   | save |                                 | wheel   |
+   |      |                                 | sliders |
+   |      |                                 | sizes   |
+   |      |                                 | swatches|
+   +------+---------------------------------+---------+
+*/
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  font-family: Arial, sans-serif;
+}
+
+#app {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100vh;
+}
+
+/* ---- header ---- */
+#top-bar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  border-bottom: 1px solid #ccc;
+}
+
+#settings-btn { justify-self: start; }
+
+.title-block { text-align: center; }
+
+.banner {
+  margin: 0;
+  font-size: 28px;
+}
+
+#round-timer {
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+#round-timer.urgent { color: red; }
+
+#round-slot { justify-self: end; }
+
+/* ---- 3-column workspace ---- */
+#workspace {
+  display: grid;
+  grid-template-columns: 72px 1fr 240px;
+  gap: 12px;
+  padding: 12px;
+  min-height: 0; /* lets the canvas shrink instead of overflowing */
+}
+
+/* left action strip: undo / clear / save */
+#toolbar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #ccc;
+  padding: 8px 0;
+}
+
+.tool {
+  width: 48px;
+  height: 48px;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.tool.active { outline: 2px solid #333; }
+
+#save-status { font-size: 11px; text-align: center; }
+
+/* center canvas: script.js sizes the <canvas> to fill #canvasDiv */
+#canvas-frame {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid #333;
+}
+
+#canvasDiv {
+  position: absolute;
+  inset: 0;
+}
+
+#canvas {
+  display: block;
+  touch-action: none; /* stop touch-scrolling while drawing */
+}
+
+/* right drawing-tools panel */
+#draw-tools {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+#color-picker-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+#color-wheel {
+  width: 100%;
+  max-width: 200px;
+  aspect-ratio: 1;
+  align-self: center;
+  border-radius: 50%;
+  cursor: crosshair;
+}
+
+#selected-color {
+  display: block;
+  text-align: center;
+  padding: 4px;
+  font-family: monospace;
+  border: 1px solid #333;
+}
+
+/* slider tracks (from the original color picker styles; saturation's
+   gradient is set live by Slider.js) */
+#brightness {
+  background: linear-gradient(to right, #000, #fff);
+}
+
+#hue {
+  background: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+}
+
+#dropper-status {
+  display: block;
+  min-height: 1em;
+  font-size: 11px;
+  text-align: center;
+}
+
+.color-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+}
+
+.panel-label { font-size: 12px; font-weight: bold; }
+
+#brush-sizes {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+#brush-sizes button {
+  flex: 1;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+#brush-sizes button i {
+  width: var(--d);
+  height: var(--d);
+  border-radius: 50%;
+  background: #000;
+}
+
+#brush-sizes button.active { outline: 2px solid #333; }
+
+#swatches {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.swatch {
+  aspect-ratio: 1;
+  border: 1px solid #999;
+  cursor: pointer;
+}
+
+/* ---- settings popup ---- */
+#outer-popup {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+#onstart-popup {
+  position: fixed;
+  z-index: 201;
+  top: 60px;
+  left: 0;
+  right: 0;
+  width: 90%;
+  max-width: 400px;
+  margin: auto;
+  padding: 10px 20px 20px;
+  background: white;
+}
+
+#onstart-popup .setting {
+  display: block;
+  margin: 12px 0;
+}
+
+.popup-x {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  font-size: 1.5em;
+  cursor: pointer;
+}
+
+/* ---- narrow screens: stack tools / canvas / colors ---- */
+@media (max-width: 800px) {
+  #app { height: auto; min-height: 100vh; }
+
+  #top-bar { grid-template-columns: auto 1fr; }
+  #round-slot { grid-column: 1 / -1; justify-self: center; }
+
+  #workspace { grid-template-columns: 1fr; }
+
+  #toolbar { flex-direction: row; justify-content: center; }
+
+  #canvas-frame { height: 60vh; }
+}
