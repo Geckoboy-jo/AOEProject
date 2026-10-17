@@ -16,3 +16,14 @@ If you would like to make this project amazing feel free to contribute. There ar
 * And much more...
 
 This was a college project, so I only have the funtionality required for the project, but I would love to see this project get better.
+
+## Trick-or-Treat Pictionary (hackathon fork)
+
+Click **New round**: a random image flashes for 3 seconds, then you draw it from memory. Hit **Reveal** to compare.
+
+**Images (Unsplash):**
+1. Create an app at https://unsplash.com/developers and copy its **Access Key**.
+2. `cp config.example.js config.js` and paste the key in. `config.js` is gitignored.
+3. Search terms live in the `QUERIES` list at the top of `imageApi.js`.
+
+With no key (or if Unsplash rate-limits us: demo apps get 50 requests/hour), it falls back to built-in emoji images so the game still works. Each API call fetches 10 images, so 50 requests is about 500 rounds.
