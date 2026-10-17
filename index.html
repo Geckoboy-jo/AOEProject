@@ -12,7 +12,7 @@
     <div id="app">
       <!-- top: settings gear, title banner, timer + round controls -->
       <header id="top-bar">
-        <button id="settings-btn" class="icon-btn" type="button" title="Settings / how to play" aria-label="Settings">⚙️</button>
+        <button id="settings-btn" class="icon-button icon-settings" type="button" title="Settings / how to play" aria-label="Settings"><span class="icon"></span></button>
         <div class="title-block">
           <h1 class="banner"><img class="logo" src="assets/ui/ui-logo.png" alt="Ghoulle" /></h1>
           <div id="round-timer" aria-live="polite">5:00</div>
@@ -23,12 +23,12 @@
       <main id="workspace">
         <!-- left: actions (undo / clear / save-export) -->
         <aside id="toolbar" aria-label="Canvas actions">
-          <button id="back" class="tool" type="button" title="Undo">↩️</button>
-          <button id="clear" class="tool" type="button" title="Clear canvas">🗑️</button>
+          <button id="back" class="tool icon-button icon-back" type="button" title="Undo" aria-label="Undo"><span class="icon"></span></button>
+          <button id="clear" class="tool icon-button icon-clear" type="button" title="Clear canvas" aria-label="Clear canvas"><span class="icon"></span></button>
           <div id="draw-tools">
-            <button id="tool-brush" class="tool active" type="button" title="Brush" aria-pressed="true">🖌️</button>
-            <button id="tool-eraser" class="tool" type="button" title="Eraser" aria-pressed="false">🧽</button>
-            <button id="tool-fill" class="tool" type="button" title="Bucket fill" aria-pressed="false">🪣</button>
+            <button id="tool-brush" class="tool icon-button icon-pencil active" type="button" title="Brush" aria-label="Brush" aria-pressed="true"><span class="icon"></span></button>
+            <button id="tool-eraser" class="tool icon-button icon-erase" type="button" title="Eraser" aria-label="Eraser" aria-pressed="false"><span class="icon"></span></button>
+            <button id="tool-fill" class="tool icon-button icon-bucket" type="button" title="Bucket fill" aria-label="Bucket fill" aria-pressed="false"><span class="icon"></span></button>
           </div>
           <label for="brush-size" class="panel-label">Brush size</label>
           <input id="brush-size" type="range" min="1" max="30" step="1" value="6" orient="vertical" aria-label="Brush size" title="Brush size" />
