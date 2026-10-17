@@ -8,7 +8,7 @@
 // to run fully offline: no judge, and scoreboards stay in localStorage.
 
 const Backend = (() => {
-  const BACKEND_URL = "";
+  const BACKEND_URL = "https://ghoulgle-api.ghoulgle.workers.dev";
 
   const base = BACKEND_URL.replace(/\/+$/, "");
   // file:// pages have a "null" origin, which the Worker's CORS check refuses
