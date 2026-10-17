@@ -32,6 +32,9 @@
           </div>
           <label for="brush-size" class="panel-label">Brush size</label>
           <input id="brush-size" type="range" min="1" max="30" step="1" value="6" orient="vertical" aria-label="Brush size" title="Brush size" />
+          <!-- live preview of the brush: actual size, current color -->
+          <div id="brush-preview-box" aria-hidden="true"><span id="brush-preview"></span></div>
+          <output id="brush-size-value" for="brush-size">6px</output>
           <output id="save-status" aria-live="polite"></output>
         </aside>
 

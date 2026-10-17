@@ -113,6 +113,31 @@ html, body {
   gap: 8px;
 }
 
+/* live brush preview under the size slider (holds up to the 60px eraser) */
+#brush-preview-box {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+}
+
+#brush-preview {
+  display: block;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+#brush-preview.eraser {
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+  outline: 1px dashed rgba(0, 0, 0, 0.5);
+  outline-offset: 2px;
+}
+
+#brush-size-value {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
 #brush-size {
   writing-mode: vertical-lr;
   direction: rtl; /* larger size at the top */

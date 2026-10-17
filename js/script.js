@@ -78,6 +78,7 @@ const createCanvas = () => {
             slots[activeSlot] = selectedColor;
             renderSlots();
             if (tool !== "fill") setTool("brush"); // picking a color switches back to the brush (fill stays)
+            renderBrushPreview();
         }
     );
 
@@ -124,6 +125,7 @@ const createCanvas = () => {
             dropperStatus.textContent = "";
             dropperStatus.style.borderBottom = "";
         }
+        renderBrushPreview();
     }
     brushBtn.addEventListener("click", () => setTool("brush"));
     eraserBtn.addEventListener("click", () => setTool("eraser"));
@@ -163,10 +165,49 @@ const createCanvas = () => {
 
     function renderSizeButtons() {
         sizeSlider.value = sizes[layer];
+        renderBrushPreview();
     }
     sizeSlider.addEventListener("input", () => {
         sizes[layer] = Number(sizeSlider.value);
+        renderBrushPreview();
     });
+
+    // ---- brush preview: dot under the slider + a cursor ring on the canvas ----
+    // Sizes are in screen pixels (strokes are drawn at size * RENDER_SCALE on the
+    // hi-res canvas), so the preview is the real on-screen stroke width.
+    function strokeWidth() {
+        const size = sizes[layer];
+        return tool === "eraser" ? Math.max(size * 2, 16) : size; // matches the eraser rule below
+    }
+
+    // (looks its elements up each call: the color wheel fires its first change
+    // during setup, before this part of createCanvas has run)
+    function renderBrushPreview() {
+        const brushPreview = document.getElementById("brush-preview");
+        const brushSizeValue = document.getElementById("brush-size-value");
+        if (!brushPreview) return;
+        const d = strokeWidth();
+        const erasing = tool === "eraser";
+        brushPreview.style.width = `${d}px`;
+        brushPreview.style.height = `${d}px`;
+        brushPreview.style.background = erasing ? CANVAS_BG : color;
+        brushPreview.classList.toggle("eraser", erasing);
+        if (brushSizeValue) brushSizeValue.textContent = `${d}px`;
+
+        // canvas cursor: a ring the size of the brush (crosshair for fill / dropper)
+        if (tool === "brush" || tool === "eraser") {
+            const r = d / 2;
+            const box = Math.ceil(d + 4);
+            const c = box / 2;
+            const svg =
+                `<svg xmlns="http://www.w3.org/2000/svg" width="${box}" height="${box}">` +
+                `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="white" stroke-width="3"/>` +
+                `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="black" stroke-width="1"/></svg>`;
+            canvas.style.cursor = `url("data:image/svg+xml,${encodeURIComponent(svg)}") ${Math.round(c)} ${Math.round(c)}, crosshair`;
+        } else {
+            canvas.style.cursor = "crosshair";
+        }
+    }
 
     function setLayer(next) {
         layer = next;
