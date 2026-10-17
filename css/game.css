@@ -135,11 +135,27 @@ body:not([data-screen="draw"]) #round-slot {
 
 /* ---- 4) results ---- */
 #results-title {
-  margin: 0 0 16px;
+  margin: 0 0 8px;
 }
+
+#results-score {
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+#results-score-num {
+  font-size: 56px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+#results-score .score-max { font-size: 20px; }
+
+#results-score-msg { font-weight: bold; }
 
 #round-bar,
 #results-title,
+#results-score,
 .results-pair figcaption,
 #screen-results > .credit,
 #results-status {
@@ -170,7 +186,7 @@ body:not([data-screen="draw"]) #round-slot {
 .results-pair img {
   width: 100%;
   /* fit the space under the header so the buttons stay on screen */
-  height: min(440px, calc(100vh - var(--header-h, 120px) - 210px));
+  height: min(440px, calc(100vh - var(--header-h, 120px) - 320px));
   min-height: 160px;
   object-fit: contain;
   border: 1px solid #ccc;

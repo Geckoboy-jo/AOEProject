@@ -134,6 +134,10 @@
       <!-- 4) results: yours vs. original -->
       <section id="screen-results" class="screen" aria-labelledby="results-title">
         <h2 id="results-title">Time's up!</h2>
+        <div id="results-score" aria-live="polite" hidden>
+          <span id="results-score-num">0</span><span class="score-max">/100</span>
+          <div id="results-score-msg"></div>
+        </div>
         <div class="results-pair">
           <figure>
             <figcaption>Yours</figcaption>
@@ -187,5 +191,6 @@
   <!-- assets/pixabay/cache.js: run `node scripts/build-pixabay-cache.js` to create it -->
   <script src="assets/pixabay/cache.js" onerror="console.info('No image cache, using the live API or emoji')"></script>
   <script src="js/imageApi.js"></script>
+  <script src="js/scoring.js"></script>
   <script src="js/game.js"></script>
 </html>

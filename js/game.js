@@ -154,7 +154,27 @@ const Game = (() => {
     $("results-original").alt = current.alt;
     $("results-credit").innerHTML = creditHTML(current);
     $("results-status").textContent = "";
+    showScore(canvas, current);
     setScreen("results");
+  }
+
+  function scoreMessage(s) {
+    if (s >= 90) return "Incredible memory!";
+    if (s >= 75) return "Really close!";
+    if (s >= 55) return "Nice work, you got the gist.";
+    if (s >= 35) return "A solid spooky attempt.";
+    return "Bold interpretation!";
+  }
+
+  async function showScore(canvas, item) {
+    const box = $("results-score");
+    box.hidden = true;
+    if (!canvas || typeof Scoring === "undefined") return;
+    const result = await Scoring.compare(canvas, item.src);
+    if (current !== item || screen !== "results" || !result) return;
+    $("results-score-num").textContent = result.score;
+    $("results-score-msg").textContent = scoreMessage(result.score);
+    box.hidden = false;
   }
 
   $("round-done").addEventListener("click", () => finish(false));
