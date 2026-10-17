@@ -259,6 +259,7 @@
         aria-labelledby="results-title"
       >
         <h2 id="results-title">Time's up!</h2>
+        <p id="results-painting" hidden></p>
         <div id="results-score" aria-live="polite" hidden>
           <span id="results-score-num">0</span
           ><span class="score-max">/100</span>
@@ -325,6 +326,8 @@
     src="assets/pixabay/cache.js"
     onerror="console.info('No image cache, using the live API or emoji')"
   ></script>
+  <!-- assets/paintings/cache.js: run `node scripts/build-paintings.js` to create it -->
+  <script src="assets/paintings/cache.js" onerror="console.info('No paintings yet')"></script>
   <script src="js/imageApi.js"></script>
   <script src="js/scoring.js"></script>
   <script src="js/game.js"></script>
