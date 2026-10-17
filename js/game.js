@@ -10,10 +10,12 @@
 // Game.mode, Game.screen.
 
 const Game = (() => {
-  // Per-mode rules. Tweak freely; the start screen reads these too.
+  // Per-mode rules. Trick vs. Treat only changes the kind of image for now;
+  // timings are kept per mode so gimmicks can be added later. The start
+  // screen reads these too.
   const MODES = {
-    treat: { name: "Treat", blurb: "Spooky", viewSeconds: 5, drawSeconds: 60 },
-    trick: { name: "Trick", blurb: "Cheeky", viewSeconds: 3, drawSeconds: 60 },
+    treat: { name: "Treat", blurb: "Spooky images", viewSeconds: 6, drawSeconds: 60 },
+    trick: { name: "Trick", blurb: "Cheeky images", viewSeconds: 6, drawSeconds: 60 },
   };
 
   const $ = (id) => document.getElementById(id);

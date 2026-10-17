@@ -28,7 +28,6 @@ const createCanvas = () => {
     const canvasDiv = document.querySelector("#canvasDiv");
     const canvas = document.createElement("canvas");
     const clearBtn = document.getElementById("clear");
-    const saveBtn = document.getElementById("save");
     const saveStatus = document.getElementById("save-status");
     const backBtn = document.getElementById("back");
     const brushBtn = document.getElementById("tool-brush");
@@ -38,11 +37,11 @@ const createCanvas = () => {
     let paint = false;
     let color = "#000000";
     let layer = "fg";
-    const sizes = { bg: 12, fg: 6 }; // brush size remembered per layer
+    const sizes = { bg: 3, fg: 6 }; // brush size remembered per layer
     let tool = "brush";
     let currentAction;
     const fillBtn = document.getElementById("tool-fill");
-    const sizeButtons = document.querySelectorAll("#brush-sizes button");
+    const sizeSlider = document.getElementById("brush-size");
     const layerButtons = document.querySelectorAll("#layer-toggle button");
     const slotButtons = document.querySelectorAll("#saved-slots button");
     const slots = ["#000000", "#ffffff"];
@@ -78,7 +77,7 @@ const createCanvas = () => {
             color = selectedColor;
             slots[activeSlot] = selectedColor;
             renderSlots();
-            setTool("brush"); // picking a color switches back to the brush
+            if (tool !== "fill") setTool("brush"); // picking a color switches back to the brush (fill stays)
         }
     );
 
@@ -163,13 +162,10 @@ const createCanvas = () => {
     }
 
     function renderSizeButtons() {
-        sizeButtons.forEach((b) => b.classList.toggle("active", Number(b.dataset.size) === sizes[layer]));
+        sizeSlider.value = sizes[layer];
     }
-    sizeButtons.forEach((btn) => {
-        btn.addEventListener("click", () => {
-            sizes[layer] = Number(btn.dataset.size);
-            renderSizeButtons();
-        });
+    sizeSlider.addEventListener("input", () => {
+        sizes[layer] = Number(sizeSlider.value);
     });
 
     function setLayer(next) {
@@ -367,8 +363,18 @@ const createCanvas = () => {
         backBtn.click();
     });
 
-    saveBtn.addEventListener("click", async () => {
-        saveBtn.disabled = true;
+    let saving = false;
+    // no save button anymore: Ctrl/Cmd+S exports the canvas
+    document.addEventListener("keydown", (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+            e.preventDefault();
+            savePng();
+        }
+    });
+
+    async function savePng() {
+        if (saving) return;
+        saving = true;
         saveStatus.textContent = "Saving…";
 
         try {
@@ -385,10 +391,10 @@ const createCanvas = () => {
             console.error("Unable to save PNG", error);
             saveStatus.textContent = "Save failed";
         } finally {
-            saveBtn.disabled = false;
+            saving = false;
             setTimeout(() => (saveStatus.textContent = ""), 2500);
         }
-    });
+    }
 
     let resizeTimer;
     window.addEventListener("resize", () => {

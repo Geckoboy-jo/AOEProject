@@ -21,11 +21,17 @@
       </header>
 
       <main id="workspace">
-        <!-- left: actions (undo / clear / save-export) -->
+        <!-- left: actions + drawing tools + brush size -->
         <aside id="toolbar" aria-label="Canvas actions">
           <button id="back" class="tool" type="button" title="Undo (Ctrl/⌘+Z)">Undo</button>
           <button id="clear" class="tool" type="button" title="Clear canvas">Clear</button>
-          <button id="save" class="tool" type="button" title="Save PNG">Save</button>
+          <div id="draw-tools">
+            <button id="tool-brush" class="tool active" type="button" title="Brush" aria-pressed="true">Brush</button>
+            <button id="tool-eraser" class="tool" type="button" title="Eraser" aria-pressed="false">Eraser</button>
+            <button id="tool-fill" class="tool" type="button" title="Bucket fill" aria-pressed="false">Fill</button>
+          </div>
+          <label for="brush-size" class="panel-label">Brush size</label>
+          <input id="brush-size" type="range" min="1" max="30" step="1" value="6" orient="vertical" aria-label="Brush size" title="Brush size" />
           <output id="save-status" aria-live="polite"></output>
         </aside>
 
@@ -34,17 +40,12 @@
           <div id="canvasDiv"></div>
         </section>
 
-        <!-- right: drawing tools (brush/eraser, color, size) -->
+        <!-- right: color controls -->
         <aside id="color-picker-panel" class="color-picker" aria-label="Drawing color controls">
-          <div id="draw-tools">
-            <button id="tool-brush" class="tool active" type="button" title="Brush" aria-pressed="true">Brush</button>
-            <button id="tool-eraser" class="tool" type="button" title="Eraser" aria-pressed="false">Eraser</button>
-            <button id="tool-fill" class="tool" type="button" title="Bucket fill" aria-pressed="false">Fill</button>
-          </div>
           <div class="panel-label">Layer</div>
           <div id="layer-toggle" role="radiogroup" aria-label="Drawing layer">
-            <button id="layer-bg" type="button" data-layer="bg" title="Draw behind">Background</button>
             <button id="layer-fg" type="button" data-layer="fg" class="active" title="Draw in front">Foreground</button>
+            <button id="layer-bg" type="button" data-layer="bg" title="Draw behind">Background</button>
           </div>
           <canvas id="color-wheel" width="240" height="240" aria-label="Color wheel"></canvas>
           <div id="color-row">
@@ -59,13 +60,6 @@
             <input id="hue" type="range" min="0" max="360" value="0" />
             <label for="saturation">Saturation</label>
             <input id="saturation" type="range" min="0" max="100" value="0" />
-          </div>
-          <div class="panel-label">Brush size</div>
-          <div id="brush-sizes" role="radiogroup" aria-label="Brush size">
-            <button type="button" data-size="3" title="Small"><i style="--d:6px"></i></button>
-            <button type="button" data-size="6" class="active" title="Medium"><i style="--d:10px"></i></button>
-            <button type="button" data-size="12" title="Large"><i style="--d:16px"></i></button>
-            <button type="button" data-size="24" title="Huge"><i style="--d:24px"></i></button>
           </div>
           <div class="panel-label">Saved colors</div>
           <div id="saved-slots" role="radiogroup" aria-label="Saved colors">
@@ -86,11 +80,11 @@
           <ol class="htp-steps">
             <li>
               <b>Trick or treat?</b>
-              <span><b>Treat</b> is spooky and you get a longer look. <b>Trick</b> is cheeky and quicker.</span>
+              <span><b>Treat</b> gets you a spooky image. <b>Trick</b> gets you a cheeky one.</span>
             </li>
             <li>
               <b>Memorize it</b>
-              <span>The image only shows for a few seconds. Don't blink.</span>
+              <span>You get 6 seconds to look at the image. Don't blink.</span>
             </li>
             <li>
               <b>Draw it</b>
@@ -105,6 +99,7 @@
             <summary>Drawing tips</summary>
             <ul>
               <li><b>Ctrl/⌘ + Z</b> undoes your last stroke.</li>
+              <li><b>Ctrl/⌘ + S</b> saves your drawing.</li>
               <li><b>Fill</b> colors in a whole shape.</li>
               <li><b>Background / Foreground</b> picks whether you draw behind or in front.</li>
               <li>The <b>dropper</b> picks a color from your drawing.</li>
