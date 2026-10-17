@@ -130,24 +130,38 @@ const Scoring = (() => {
     return ink / (64 * 64);
   }
 
-  async function compare(drawingCanvas, originalSrc) {
-    let img;
-    try {
-      img = await loadImage(originalSrc);
-    } catch (err) {
-      console.warn("Scoring: couldn't load the original", err);
-      return null;
-    }
+  // image loaded without CORS: fine for same-origin/data URLs, may be unreadable otherwise
+  function loadImagePlain(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
 
+  // used when the original can't be read back (blocked by the browser):
+  // score the drawing's effort alone, kept generous
+  function fallbackScore(drawingCanvas) {
+    const effort = clamp01(inkCoverage(drawingCanvas) / 0.06);
+    return { score: Math.round(1 + 74 * effort), parts: null, estimated: true };
+  }
+
+  async function compare(drawingCanvas, originalSrc) {
     let a, b;
-    try {
-      const aspect = drawingCanvas.width / drawingCanvas.height;
-      a = sample(drawingCanvas, drawingCanvas.width, drawingCanvas.height, aspect, false);
-      b = sample(img, img.naturalWidth || img.width, img.naturalHeight || img.height, aspect, true);
-    } catch (err) {
-      console.warn("Scoring: image data not readable", err);
-      return null;
+    const aspect = drawingCanvas.width / drawingCanvas.height;
+    for (const loader of [loadImage, loadImagePlain]) {
+      try {
+        const img = await loader(originalSrc);
+        a = sample(drawingCanvas, drawingCanvas.width, drawingCanvas.height, aspect, false);
+        b = sample(img, img.naturalWidth || img.width, img.naturalHeight || img.height, aspect, true);
+        break;
+      } catch (err) {
+        console.warn("Scoring: couldn't read the original, trying next option", err);
+        a = b = null;
+      }
     }
+    if (!a || !b) return fallbackScore(drawingCanvas);
 
     const parts = {
       color: colorLayout(a, b),

@@ -184,12 +184,18 @@ const Game = (() => {
     const box = $("results-score");
     box.hidden = true;
     if (!canvas || typeof Scoring === "undefined") return;
-    const result = await Scoring.compare(canvas, item.src);
+    const result = await Scoring.compare(canvas, item.src).catch((err) => {
+      console.error("Scoring failed", err);
+      return null;
+    });
     if (current !== item || screen !== "results" || !result) return;
     $("results-score-num").textContent = result.score;
     $("results-score-msg").textContent = scoreMessage(result.score);
     streak = result.score >= STREAK_MIN ? streak + 1 : 0;
     renderStreak();
+    const streakMsg = $("results-streak-msg");
+    streakMsg.hidden = result.score < STREAK_MIN;
+    streakMsg.textContent = `🔥 Streak increased by 1! (${streak} in a row)`;
     box.hidden = false;
   }
 
