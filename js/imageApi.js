@@ -6,6 +6,7 @@
 //   2. the live Unsplash API, if config.js has a key
 //   3. built-in emoji images, so the demo never breaks
 // Set APP_CONFIG.PREFER_LIVE_API = true in config.js to skip the cache.
+// When hosted (anything but localhost / file://), the live API is off: cache only.
 //
 // Categories: "treat" (spooky), "trick" (cheeky), or "either".
 //   const img = await ImageApi.next("trick");
@@ -55,7 +56,10 @@ const ImageApi = (() => {
   const cachedPhotos = (category) =>
     allCachedPhotos().filter((p) => (p.category || queryCategory[p.prompt]) === category);
 
-  const preferLive = () => !!(window.APP_CONFIG && window.APP_CONFIG.PREFER_LIVE_API);
+  // Hosted builds (e.g. GitHub Pages) never call a live API or use a key.
+  const isLocal = ["localhost", "127.0.0.1", "[::1]", ""].includes(location.hostname);
+
+  const preferLive = () => isLocal && !!(window.APP_CONFIG && window.APP_CONFIG.PREFER_LIVE_API);
 
   // Deal from a shuffled deck so you don't see repeats until the whole cache is used.
   function cachedBatch(category) {
@@ -92,7 +96,7 @@ const ImageApi = (() => {
   }
 
   const accessKey = () =>
-    (window.APP_CONFIG && window.APP_CONFIG.UNSPLASH_ACCESS_KEY) || "";
+    (isLocal && window.APP_CONFIG && window.APP_CONFIG.UNSPLASH_ACCESS_KEY) || "";
 
   const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
