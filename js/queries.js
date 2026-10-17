@@ -1,40 +1,43 @@
-// queries.js: Unsplash search terms by category, shared by the page
-// (imageApi.js) and the cache builder (scripts/build-image-cache.js).
+// queries.js: search terms by category, used by the image cache builders
+// (scripts/build-pixabay-cache.js) and the live-API fallback in imageApi.js.
 // Re-run the cache builder after changing them.
 //
-//   treat = spooky Halloween images
-//   trick = cheeky, funny curveballs
+//   treat = spooky Halloween things
+//   trick = cheeky, random curveballs
 //
-// Keep terms specific. Generic ones ("frog", "pizza slice", "candy corn")
-// return plain stock photos; Halloween/costume/3D terms return the good stuff.
+// Results are illustrations/vector art, so simple one-subject terms work best.
 const IMAGE_QUERIES = {
   treat: [
     "jack o lantern",
-    "carved pumpkin",
-    "halloween 3d",
-    "halloween cartoon",
-    "halloween decorations",
-    "ghost costume",
-    "skeleton decoration",
-    "halloween costume",
-    "haunted house",
+    "ghost",
+    "bat halloween",
+    "witch",
     "black cat halloween",
-    "witch costume",
-    "zombie costume",
+    "skeleton",
+    "haunted house",
+    "spider web",
+    "vampire",
+    "mummy",
+    "zombie",
+    "cauldron",
+    "candy corn",
+    "gravestone",
   ],
   trick: [
-    "dog halloween costume",
-    "cat halloween costume",
-    "dog ghost costume",
-    "dog wearing sunglasses",
-    "pug costume",
-    "funny monster",
-    "3d monster character",
+    "funny dog",
+    "cat cartoon",
     "rubber duck",
-    "cat wearing hat",
-    "goofy dog",
-    "funny face costume",
-    "googly eyes",
+    "cute monster",
+    "dinosaur cartoon",
+    "alien cartoon",
+    "pizza cartoon",
+    "taco",
+    "frog cartoon",
+    "sloth",
+    "octopus cartoon",
+    "robot cartoon",
+    "banana cartoon",
+    "llama",
   ],
 };
 
