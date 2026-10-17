@@ -2,14 +2,14 @@ console.log("starting the app!");
 
 const artWrapper = new Wrapper();
 
-// how-to-play dialog (markup in index.html, behavior in howToPlay.js)
+// settings dialog (gear). Markup in index.html, wired up in game.js.
 const closePopup = () => {
-    const dialog = document.getElementById("how-to-play");
+    const dialog = document.getElementById("settings-dialog");
     if (dialog && dialog.open) dialog.close();
 };
 
 const openPopup = () => {
-    const dialog = document.getElementById("how-to-play");
+    const dialog = document.getElementById("settings-dialog");
     if (dialog && !dialog.open) dialog.showModal();
 };
 

@@ -8,14 +8,14 @@
     <link type="text/css" rel="stylesheet" href="css/game.css" />
   </head>
 
-  <body>
+  <body data-screen="start">
     <div id="app">
       <!-- top: settings gear, title banner, timer + round controls -->
       <header id="top-bar">
-        <button id="settings-btn" class="icon-btn" type="button" title="How to play / settings" aria-label="How to play and settings">⚙️</button>
+        <button id="settings-btn" class="icon-btn" type="button" title="Settings" aria-label="Settings">Settings</button>
         <div class="title-block">
           <h1 class="banner"><span>GHOULLE</span></h1>
-          <div id="round-timer" aria-live="polite">5:00</div>
+          <div id="round-timer" aria-live="polite"></div>
         </div>
         <div id="round-slot"></div>
       </header>
@@ -23,9 +23,9 @@
       <main id="workspace">
         <!-- left: actions (undo / clear / save-export) -->
         <aside id="toolbar" aria-label="Canvas actions">
-          <button id="back" class="tool" type="button" title="Undo">↩️</button>
-          <button id="clear" class="tool" type="button" title="Clear canvas">🗑️</button>
-          <button id="save" class="tool" type="button" title="Save PNG">💾</button>
+          <button id="back" class="tool" type="button" title="Undo (Ctrl/⌘+Z)">Undo</button>
+          <button id="clear" class="tool" type="button" title="Clear canvas">Clear</button>
+          <button id="save" class="tool" type="button" title="Save PNG">Save</button>
           <output id="save-status" aria-live="polite"></output>
         </aside>
 
@@ -37,9 +37,9 @@
         <!-- right: drawing tools (brush/eraser, color, size) -->
         <aside id="color-picker-panel" class="color-picker" aria-label="Drawing color controls">
           <div id="draw-tools">
-            <button id="tool-brush" class="tool active" type="button" title="Brush" aria-pressed="true">🖌️</button>
-            <button id="tool-eraser" class="tool" type="button" title="Eraser" aria-pressed="false">🧽</button>
-            <button id="tool-fill" class="tool" type="button" title="Bucket fill" aria-pressed="false">🪣</button>
+            <button id="tool-brush" class="tool active" type="button" title="Brush" aria-pressed="true">Brush</button>
+            <button id="tool-eraser" class="tool" type="button" title="Eraser" aria-pressed="false">Eraser</button>
+            <button id="tool-fill" class="tool" type="button" title="Bucket fill" aria-pressed="false">Fill</button>
           </div>
           <div class="panel-label">Layer</div>
           <div id="layer-toggle" role="radiogroup" aria-label="Drawing layer">
@@ -54,7 +54,7 @@
           <output id="dropper-status" aria-live="polite"></output>
           <div class="color-controls">
             <label for="brightness">Brightness</label>
-            <input id="brightness" type="range" min="0" max="100" value="100" />
+            <input id="brightness" type="range" min="0" max="100" value="0" />
             <label for="hue">Hue</label>
             <input id="hue" type="range" min="0" max="360" value="0" />
             <label for="saturation">Saturation</label>
@@ -76,69 +76,104 @@
           <div id="swatches"></div>
         </aside>
       </main>
+
+      <!-- ===== screens (overlay the workspace; body[data-screen] picks which shows) ===== -->
+
+      <!-- 1) start: how to play + pick a mode -->
+      <section id="screen-start" class="screen" aria-labelledby="start-title">
+        <div class="start-card">
+          <h2 id="start-title">How to play</h2>
+          <ol class="htp-steps">
+            <li>
+              <b>Trick or treat?</b>
+              <span><b>Treat</b> is spooky and you get a longer look. <b>Trick</b> is cheeky and quicker.</span>
+            </li>
+            <li>
+              <b>Memorize it</b>
+              <span>The image only shows for a few seconds. Don't blink.</span>
+            </li>
+            <li>
+              <b>Draw it</b>
+              <span>Recreate it from memory before the timer runs out.</span>
+            </li>
+            <li>
+              <b>Compare</b>
+              <span>See yours next to the original, then save or share it.</span>
+            </li>
+          </ol>
+          <details class="htp-tips">
+            <summary>Drawing tips</summary>
+            <ul>
+              <li><b>Ctrl/⌘ + Z</b> undoes your last stroke.</li>
+              <li><b>Fill</b> colors in a whole shape.</li>
+              <li><b>Background / Foreground</b> picks whether you draw behind or in front.</li>
+              <li>The <b>dropper</b> picks a color from your drawing.</li>
+            </ul>
+          </details>
+          <div class="mode-buttons">
+            <button type="button" class="mode-btn" data-mode="treat" autofocus>
+              <span class="mode-name">Treat</span>
+              <small class="mode-desc" data-mode-desc="treat"></small>
+            </button>
+            <button type="button" class="mode-btn" data-mode="trick">
+              <span class="mode-name">Trick</span>
+              <small class="mode-desc" data-mode-desc="trick"></small>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2) preview: the image to memorize (look-time countdown shows in the header) -->
+      <section id="screen-preview" class="screen" aria-live="polite">
+        <div class="preview-card">
+          <div class="preview-frame">
+            <img id="preview-img" alt="" />
+          </div>
+          <p class="preview-caption">Draw this in <b id="preview-draw-time">1:00</b></p>
+          <p class="credit" id="preview-credit"></p>
+        </div>
+      </section>
+
+      <!-- 4) results: yours vs. original -->
+      <section id="screen-results" class="screen" aria-labelledby="results-title">
+        <h2 id="results-title">Time's up!</h2>
+        <div class="results-pair">
+          <figure>
+            <figcaption>Yours</figcaption>
+            <img id="results-drawing" alt="your drawing" />
+          </figure>
+          <figure>
+            <figcaption>Original</figcaption>
+            <img id="results-original" alt="" />
+          </figure>
+        </div>
+        <p class="credit" id="results-credit"></p>
+        <div class="results-actions">
+          <button id="results-save" type="button">Save</button>
+          <button id="results-share" type="button">Share</button>
+          <button id="results-again" type="button">Play again</button>
+        </div>
+        <output id="results-status" aria-live="polite"></output>
+      </section>
     </div>
 
-    <!-- how-to-play / settings dialog: opens on load (unless dismissed) and from the gear -->
-    <dialog id="how-to-play" aria-labelledby="htp-title">
+    <!-- settings dialog (gear, available on every screen) -->
+    <dialog id="settings-dialog" aria-labelledby="settings-title">
       <button class="htp-close" type="button" aria-label="Close" data-close>&times;</button>
-
-      <header class="htp-head">
-        <h2 id="htp-title">Welcome to Ghoulle 🎃</h2>
-        <p class="htp-tagline">See it for 3 seconds. Draw it from memory.</p>
-      </header>
-
-      <ol class="htp-steps">
-        <li>
-          <span class="htp-icon" aria-hidden="true">🍬🎭</span>
-          <b>Trick or treat?</b>
-          <span><b>Treat</b> gets you something spooky. <b>Trick</b> gets you something cheeky.</span>
-        </li>
-        <li>
-          <span class="htp-icon" aria-hidden="true">👀</span>
-          <b>Memorize it</b>
-          <span>The image flashes for just 3 seconds. Don't blink.</span>
-        </li>
-        <li>
-          <span class="htp-icon" aria-hidden="true">✏️</span>
-          <b>Draw it</b>
-          <span>Recreate it before the timer runs out.</span>
-        </li>
-        <li>
-          <span class="htp-icon" aria-hidden="true">👻</span>
-          <b>The reveal</b>
-          <span>See your drawing next to the real thing. Hit Reveal early if you're done.</span>
-        </li>
-      </ol>
-
-      <details class="htp-tips">
-        <summary>Drawing tips</summary>
-        <ul>
-          <li><b>Ctrl/⌘ + Z</b> undoes your last stroke.</li>
-          <li>🪣 <b>Bucket fill</b> colors in a whole shape.</li>
-          <li><b>Background / Foreground</b> picks whether you draw behind or in front.</li>
-          <li>💧 <b>Dropper</b> picks a color from your drawing.</li>
-        </ul>
-      </details>
-
-      <div class="htp-settings">
-        <label>
-          Drawing time
-          <select id="round-length">
-            <option value="60">1:00</option>
-            <option value="180">3:00</option>
-            <option value="300" selected>5:00</option>
-          </select>
-        </label>
-        <label class="htp-dontshow">
-          <input type="checkbox" id="htp-dontshow" />
-          Don't show this on startup
-        </label>
-      </div>
-
-      <div class="htp-actions">
-        <button type="button" class="htp-start" data-category="treat" autofocus>🍬 Treat</button>
-        <button type="button" class="htp-start" data-category="trick">🎭 Trick</button>
-        <button type="button" class="htp-secondary" data-close>Just let me doodle</button>
+      <h2 id="settings-title">Settings</h2>
+      <label class="setting">
+        Drawing time
+        <select id="round-length">
+          <option value="auto" selected>Default for the mode</option>
+          <option value="30">0:30</option>
+          <option value="60">1:00</option>
+          <option value="180">3:00</option>
+          <option value="300">5:00</option>
+        </select>
+      </label>
+      <div class="settings-actions">
+        <button id="settings-quit" type="button">Back to start</button>
+        <button type="button" data-close>Done</button>
       </div>
     </dialog>
   </body>
@@ -156,5 +191,4 @@
   <script src="assets/unsplash/cache.js" onerror="console.info('No image cache, using the live API or emoji')"></script>
   <script src="js/imageApi.js"></script>
   <script src="js/game.js"></script>
-  <script src="js/howToPlay.js"></script>
 </html>
