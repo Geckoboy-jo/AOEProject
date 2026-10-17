@@ -1,6 +1,6 @@
 # Web Based Drawing App
 
-This is a web based drawing application that uses **`HTML`**, **`CSS`** and **`JavaScript`** to allow you to draw anything you like on the web. Choose drawing colors with the HSV color wheel or its brightness, hue, and saturation sliders.
+This is a web based drawing application that uses **`HTML`**, **`CSS`** and **`JavaScript`** to allow you to draw anything you like on the web. Choose drawing colors with the HSV color wheel or its brightness, hue, and saturation sliders. Save the current canvas as a PNG and choose its file location in browsers that support the File System Access API.
 
 [Click here](https://sudipt1999.github.io/drawing-app/) to start drawing.
 

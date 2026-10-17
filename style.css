@@ -38,10 +38,10 @@ body{
     background-color: #555;
 }
 
-#savedImg
-{
-    display:block;
-    margin:40px auto;
+#save-status {
+    display: block;
+    min-height: 1.5em;
+    text-align: center;
 }
 
 #outer-popup {

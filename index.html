@@ -12,14 +12,15 @@
    
     <div class="button-bars">
       <button id="clear">CLEAR</button>
-      <button id="save">SAVE</button>
+      <button id="save">SAVE PNG</button>
       <button id="back">BACK</button>
     </div>
+    <output id="save-status" aria-live="polite"></output>
     <section id="color-picker-panel" class="color-picker" aria-label="Drawing color controls">
       <canvas id="color-wheel" width="240" height="240" aria-label="Color wheel"></canvas>
       <div class="color-controls">
         <label for="brightness">Brightness</label>
-        <input id="brightness" type="range" min="0" max="100" value="0" />
+        <input id="brightness" type="range" min="0" max="100" value="100" />
         <label for="hue">Hue</label>
         <input id="hue" type="range" min="0" max="360" value="0" />
         <label for="saturation">Saturation</label>
@@ -27,10 +28,6 @@
         <output id="selected-color" aria-live="polite"></output>
       </div>
     </section>
-    <div id="img-container">
-      <img id="savedImg" alt="saved picture" src="" />
-    </div>
-
     <!-- Popup at the start -->
     <div onclick="closePopup()" id="outer-popup"></div>
     <div id="onstart-popup">
@@ -48,5 +45,6 @@
   <script src="wrapper.js"></script>
   <script src="Slider.js"></script>
   <script src="ColorWheel.js"></script>
+  <script src="ExportManager.js"></script>
   <script src="script.js"></script>
 </html>

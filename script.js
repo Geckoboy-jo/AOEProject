@@ -15,6 +15,7 @@ const createCanvas = () =>{
         const canvas = document.createElement('canvas');
         const clearBtn=document.getElementById('clear');
         const saveBtn = document.getElementById('save');
+        const saveStatus = document.getElementById('save-status');
         const backBtn = document.getElementById('back');
         let canvasHeight = window.innerHeight-100;
         let canvasWidth  = window.innerWidth-100;
@@ -97,10 +98,26 @@ const createCanvas = () =>{
                   redraw();
                 });
                       
-                saveBtn.addEventListener('click',()=>{
-                      var dataURL = canvas.toDataURL('image/jpeg', 1.0);
-                      let savedImg = document.getElementById('savedImg');
-                      savedImg.setAttribute('src',dataURL);                   
+                saveBtn.addEventListener('click', async () => {
+                      saveBtn.disabled = true;
+                      saveStatus.textContent = "Opening save dialog...";
+
+                      try {
+                        const result = await ExportManager.saveCanvasAsPng(canvas);
+
+                        if (!result.saved) {
+                          saveStatus.textContent = "Save cancelled.";
+                        } else if (result.choseLocation) {
+                          saveStatus.textContent = "PNG saved.";
+                        } else {
+                          saveStatus.textContent = "PNG download started. Configure your browser to choose its download folder.";
+                        }
+                      } catch (error) {
+                        console.error("Unable to save PNG", error);
+                        saveStatus.textContent = "Unable to save PNG. Check browser permissions and try again.";
+                      } finally {
+                        saveBtn.disabled = false;
+                      }
                 });
 
 
