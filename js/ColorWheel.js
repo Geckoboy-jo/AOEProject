@@ -38,6 +38,7 @@ class ColorWheel {
 
             this.hue = (Math.atan2(y - centerY, x - centerX) * 180 / Math.PI + 360) % 360;
             this.saturation = Math.min(100, distance / radius * 100);
+            if (Number(this.brightness) === 0) this.brightness = 100;
             this.update();
         });
     }
