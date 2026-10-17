@@ -4,6 +4,10 @@
 //
 // Writes:  assets/unsplash/<id>.jpg   the images (gitignored, share them out of band)
 //          assets/unsplash/cache.js   list of photos + photographer credits
+// Reads:   assets/unsplash/blocklist.json   photo ids to never add (rejects)
+//
+// To curate: delete a photo's entry from cache.js and add its id to
+// blocklist.json, or edit its "category" to move it between trick/treat.
 //
 // The game uses the local file when it exists, and falls back to the
 // Unsplash URL when it doesn't, so cache.js works even without the images.
@@ -23,7 +27,7 @@ const DIR = path.join(ROOT, "assets", "unsplash");
 const OUT = path.join(DIR, "cache.js");
 const IMAGE_WIDTH = 800; // plenty for a 3-second flash; keeps files ~100KB
 const DOWNLOAD_CONCURRENCY = 6;
-const PER_QUERY = 30; // Unsplash max per request
+const PER_QUERY = 15; // per search term, so no single term floods the set (Unsplash max is 30)
 const UTM = "utm_source=aoe_hackathon_drawing_game&utm_medium=referral";
 
 function loadBrowserScript(file, globalName) {
@@ -96,9 +100,11 @@ async function main() {
   const fresh = process.argv.includes("--fresh");
   const existing = fresh ? undefined : loadBrowserScript(OUT, "IMAGE_CACHE");
   const byId = new Map((existing?.photos || []).map((p) => [p.id, p]));
+  const blockFile = path.join(DIR, "blocklist.json");
+  const blocked = new Set(fs.existsSync(blockFile) ? JSON.parse(fs.readFileSync(blockFile, "utf8")) : []);
   const startCount = byId.size;
 
-  console.log(`Fetching ${queries.length} queries x ${PER_QUERY} photos (${queries.length} API requests)...`);
+  console.log(`Fetching ${queries.length} queries x ${PER_QUERY} photos (${queries.length} API requests, ${blocked.size} blocked ids)...`);
   let remaining = "?";
 
   for (const { category, query } of queries) {
@@ -122,7 +128,7 @@ async function main() {
     const photos = await res.json();
     let added = 0;
     for (const p of photos) {
-      if (byId.has(p.id)) continue; // first category to find a photo keeps it
+      if (byId.has(p.id) || blocked.has(p.id)) continue; // keep existing entries (and their category); skip rejects
       byId.set(p.id, {
         id: p.id,
         file: `assets/unsplash/${p.id}.jpg`,
