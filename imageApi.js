@@ -1,7 +1,8 @@
 // imageApi.js — pulls random "trick or treat" images for each round.
 //
 // Where images come from, in order:
-//   1. image-cache.js (built by scripts/build-image-cache.js): zero API calls
+//   1. assets/unsplash/cache.js (built by scripts/build-image-cache.js): zero
+//      API calls; uses the downloaded file, or the Unsplash URL if it's missing
 //   2. the live Unsplash API, if config.js has a key
 //   3. built-in emoji images, so the demo never breaks
 // Set APP_CONFIG.PREFER_LIVE_API = true in config.js to skip the cache.
@@ -51,7 +52,8 @@ const ImageApi = (() => {
       }
       const p = cacheDeck.pop();
       out.push({
-        src: p.src,
+        src: p.file || p.src,
+        remoteSrc: p.src,
         alt: p.alt,
         prompt: p.prompt,
         credit: { name: p.credit.name, link: p.credit.link, unsplash: `https://unsplash.com/?${UTM}` },
@@ -116,9 +118,19 @@ const ImageApi = (() => {
   }
 
   function preload(item) {
-    const img = new Image();
-    img.src = item.src;
-    item.ready = img.decode().catch(() => {}); // resolves once it can display instantly
+    const load = (src) => {
+      const img = new Image();
+      img.src = src;
+      return img.decode();
+    };
+    // resolves once it can display instantly; if a cached file is missing,
+    // switch to the Unsplash URL instead
+    item.ready = load(item.src).catch(() => {
+      if (item.remoteSrc && item.remoteSrc !== item.src) {
+        item.src = item.remoteSrc;
+        return load(item.src).catch(() => {});
+      }
+    });
     return item;
   }
 
