@@ -16,11 +16,6 @@ const createCanvas = () =>{
         const clearBtn=document.getElementById('clear');
         const saveBtn = document.getElementById('save');
         const backBtn = document.getElementById('back');
-        const blackBtn = document.querySelector('div[data-color="black"]');
-        const greenBtn = document.querySelector('div[data-color="green"]');
-        const blueBtn = document.querySelector('div[data-color="blue"]');
-        const purpleBtn = document.querySelector('div[data-color="purple"]');
-        const redBtn = document.querySelector('div[data-color="red"]');
         let canvasHeight = window.innerHeight-100;
         let canvasWidth  = window.innerWidth-100;
         var paint;
@@ -48,39 +43,20 @@ const createCanvas = () =>{
         context.fillStyle="#fff";
         context.fillRect(0,0,context.canvas.width, context.canvas.height);
 
-                // changes the color state of the canvas based on box clicked in welcome modal
-                function selectColor(newColor) {
-                  switch(newColor) {
-                    case 'green':
-                      color = "#baff33";
-                      closePopup();
-                      break;
-                    case 'red':
-                      color = "#ff2b2b";
-                      closePopup();
-                      break;
-                    case 'purple':
-                      color = "#b700ff";
-                      closePopup();
-                      break;
-                    case 'blue':
-                      color = "#006eff";
-                      closePopup();
-                      break;
-                    case 'black':
-                    default:
-                      color = "#000000";
-                      closePopup();
-                      break;
-                  }
-                }
+                const colorSliders = new ColorSliders(
+                  document.getElementById('hue'),
+                  document.getElementById('saturation'),
+                  document.getElementById('brightness')
+                );
 
-                // add click listener for all color options in welcome modal
-                blackBtn.addEventListener('click', (event) => selectColor(event.target.dataset.color));
-                blueBtn.addEventListener('click', (event) => selectColor(event.target.dataset.color));
-                greenBtn.addEventListener('click', (event) => selectColor(event.target.dataset.color));
-                purpleBtn.addEventListener('click', (event) => selectColor(event.target.dataset.color));
-                redBtn.addEventListener('click', (event) => selectColor(event.target.dataset.color));
+                new ColorWheel(
+                  document.getElementById('color-wheel'),
+                  colorSliders,
+                  document.getElementById('selected-color'),
+                  (selectedColor) => {
+                    color = selectedColor;
+                  }
+                );
 
                 function addPoint(x, y)
                 {
@@ -143,7 +119,7 @@ const createCanvas = () =>{
                     }
                   });
             
-                 canvas.addEventListener('mouseup',function(e){
+                 window.addEventListener('mouseup',function(e){
                      paint = false;
                      currentAction = undefined;
                  });

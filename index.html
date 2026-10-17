@@ -15,6 +15,18 @@
       <button id="save">SAVE</button>
       <button id="back">BACK</button>
     </div>
+    <section id="color-picker-panel" class="color-picker" aria-label="Drawing color controls">
+      <canvas id="color-wheel" width="240" height="240" aria-label="Color wheel"></canvas>
+      <div class="color-controls">
+        <label for="brightness">Brightness</label>
+        <input id="brightness" type="range" min="0" max="100" value="0" />
+        <label for="hue">Hue</label>
+        <input id="hue" type="range" min="0" max="360" value="0" />
+        <label for="saturation">Saturation</label>
+        <input id="saturation" type="range" min="0" max="100" value="0" />
+        <output id="selected-color" aria-live="polite"></output>
+      </div>
+    </section>
     <div id="img-container">
       <img id="savedImg" alt="saved picture" src="" />
     </div>
@@ -28,19 +40,13 @@
         button to clear the canvas, and click the save button to save your
         drawing. Have fun!
       </p>
-      <h4>Select a Color</h4>
-      <section class="color-selector">
-            <div class="color" data-color="black"></div>
-            <div class="color" data-color="green"></div>
-            <div class="color" data-color="blue"></div>
-            <div class="color" data-color="purple"></div>
-            <div class="color" data-color="red"></div>
-      </section>
       <div onclick="closePopup()">&times;</div>
     </div>
   </body>
 
   <script src="stack.js"></script>
   <script src="wrapper.js"></script>
+  <script src="Slider.js"></script>
+  <script src="ColorWheel.js"></script>
   <script src="script.js"></script>
 </html>
