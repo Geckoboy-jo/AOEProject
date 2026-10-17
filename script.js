@@ -13,6 +13,7 @@ const openPopup = () => {
 };
 
 const CANVAS_BG = "#ffffff";
+const RENDER_SCALE = 2;
 
 // spooky preset colors for the swatch grid
 const SWATCHES = [
@@ -54,8 +55,10 @@ const createCanvas = () => {
     // size the canvas to fill its frame (and re-fit when the window changes)
     function fitCanvas() {
         const { width, height } = canvasDiv.getBoundingClientRect();
-        canvas.width = Math.max(1, Math.floor(width));
-        canvas.height = Math.max(1, Math.floor(height));
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
+        canvas.width = Math.max(1, Math.round(width * RENDER_SCALE));
+        canvas.height = Math.max(1, Math.round(height * RENDER_SCALE));
         redraw();
     }
 
@@ -236,7 +239,7 @@ const createCanvas = () => {
 
     function drawStroke(ctx, action) {
         const points = action.points;
-        const width = action.size || 5;
+        const width = (action.size || 5) * RENDER_SCALE;
 
         ctx.globalCompositeOperation = action.erase ? "destination-out" : "source-over";
         ctx.strokeStyle = action.color;
