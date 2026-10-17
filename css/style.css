@@ -120,6 +120,38 @@ body {
 
 .tool.active { outline: 2px solid #fff; }
 
+/* icon buttons: one shared background image + a separate icon image per button */
+:root {
+  --icon-button-bg: url("../assets/ui/ui-button.png");
+}
+
+.icon-button {
+  position: relative;
+  width: 48px;
+  min-width: 0; /* stay square even when it's also a .tool */
+  height: 48px;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  background: #444 var(--icon-button-bg) center / 100% 100% no-repeat;
+  image-rendering: pixelated;
+}
+
+.icon-button .icon {
+  position: absolute;
+  inset: 0;
+  background: var(--icon) center / 70% no-repeat;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+.icon-back     { --icon: url("../assets/ui/icon-back.png"); }
+.icon-clear    { --icon: url("../assets/ui/icon-clear.png"); }
+.icon-erase    { --icon: url("../assets/ui/icon-erase.png"); }
+.icon-settings { --icon: url("../assets/ui/icon-settings.png"); }
+.icon-pencil   { --icon: url("../assets/ui/icon-pencil.png"); }
+.icon-bucket   { --icon: url("../assets/ui/icon-bucket.png"); }
+
 #save-status { font-size: 11px; text-align: center; }
 
 /* center canvas: script.js sizes the <canvas> to fill #canvasDiv */
