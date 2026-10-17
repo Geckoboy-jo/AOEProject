@@ -1,48 +1,88 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>SketchToPhoto</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ghoulle</title>
     <link type="text/css" rel="stylesheet" href="style.css" />
     <link type="text/css" rel="stylesheet" href="game.css" />
   </head>
 
   <body>
-    <!--CODE TO BE WRITTEN HERE--->
-    <!--creating a div for canvas where drawing is to be made-->
-    <div id="canvasDiv"></div>
-   
-    <div class="button-bars">
-      <button id="clear">CLEAR</button>
-      <button id="save">SAVE PNG</button>
-      <button id="back">BACK</button>
-      <button id="dropper" type="button" aria-pressed="false">DROPPER</button>
-    </div>
-    <output id="dropper-status" aria-live="polite"></output>
-    <output id="save-status" aria-live="polite"></output>
-    <section id="color-picker-panel" class="color-picker" aria-label="Drawing color controls">
-      <canvas id="color-wheel" width="240" height="240" aria-label="Color wheel"></canvas>
-      <div class="color-controls">
-        <label for="brightness">Brightness</label>
-        <input id="brightness" type="range" min="0" max="100" value="100" />
-        <label for="hue">Hue</label>
-        <input id="hue" type="range" min="0" max="360" value="0" />
-        <label for="saturation">Saturation</label>
-        <input id="saturation" type="range" min="0" max="100" value="0" />
-        <output id="selected-color" aria-live="polite"></output>
-      </div>
-    </section>
+    <div id="app">
+      <!-- top: settings gear, title banner, timer + round controls -->
+      <header id="top-bar">
+        <button id="settings-btn" class="icon-btn" type="button" title="Settings / how to play" aria-label="Settings">⚙️</button>
+        <div class="title-block">
+          <h1 class="banner"><span>GHOULLE</span></h1>
+          <div id="round-timer" aria-live="polite">5:00</div>
+        </div>
+        <div id="round-slot"></div>
+      </header>
 
-    <!-- Popup at the start -->
+      <main id="workspace">
+        <!-- left: actions (undo / clear / save-export) -->
+        <aside id="toolbar" aria-label="Canvas actions">
+          <button id="back" class="tool" type="button" title="Undo">↩️</button>
+          <button id="clear" class="tool" type="button" title="Clear canvas">🗑️</button>
+          <button id="save" class="tool" type="button" title="Save PNG">💾</button>
+          <output id="save-status" aria-live="polite"></output>
+        </aside>
+
+        <!-- center: the canvas (script.js creates the <canvas> in here) -->
+        <section id="canvas-frame">
+          <div id="canvasDiv"></div>
+        </section>
+
+        <!-- right: drawing tools (brush/eraser/dropper, color, size) -->
+        <aside id="color-picker-panel" class="color-picker" aria-label="Drawing color controls">
+          <div id="draw-tools">
+            <button id="tool-brush" class="tool active" type="button" title="Brush" aria-pressed="true">🖌️</button>
+            <button id="tool-eraser" class="tool" type="button" title="Eraser" aria-pressed="false">🧽</button>
+            <button id="dropper" class="tool" type="button" title="Dropper: pick a color from the canvas" aria-pressed="false">💧</button>
+          </div>
+          <output id="dropper-status" aria-live="polite"></output>
+          <canvas id="color-wheel" width="240" height="240" aria-label="Color wheel"></canvas>
+          <output id="selected-color" aria-live="polite"></output>
+          <div class="color-controls">
+            <label for="brightness">Brightness</label>
+            <input id="brightness" type="range" min="0" max="100" value="100" />
+            <label for="hue">Hue</label>
+            <input id="hue" type="range" min="0" max="360" value="0" />
+            <label for="saturation">Saturation</label>
+            <input id="saturation" type="range" min="0" max="100" value="0" />
+          </div>
+          <div class="panel-label">Brush size</div>
+          <div id="brush-sizes" role="radiogroup" aria-label="Brush size">
+            <button type="button" data-size="3" title="Small"><i style="--d:6px"></i></button>
+            <button type="button" data-size="6" class="active" title="Medium"><i style="--d:10px"></i></button>
+            <button type="button" data-size="12" title="Large"><i style="--d:16px"></i></button>
+            <button type="button" data-size="24" title="Huge"><i style="--d:24px"></i></button>
+          </div>
+          <div class="panel-label">Swatches</div>
+          <div id="swatches"></div>
+        </aside>
+      </main>
+    </div>
+
+    <!-- settings / how-to-play popup (opens on load and from the gear) -->
     <div onclick="closePopup()" id="outer-popup"></div>
-    <div id="onstart-popup">
-      <h2>Drawing App</h2>
+    <div id="onstart-popup" role="dialog" aria-labelledby="popup-title">
+      <h2 id="popup-title">Ghoulle 🎃</h2>
       <p>
-        Welcome to the Drawing App. Click on the canvas to draw, click the clear
-        button to clear the canvas, and click the save button to save your
-        drawing. Have fun!
+        Hit <b>New round</b> and an image flashes for 3 seconds. Then draw it
+        from memory before the timer runs out. Trick or treat?
       </p>
-      <div onclick="closePopup()">&times;</div>
+      <label class="setting">
+        Drawing time
+        <select id="round-length">
+          <option value="60">1:00</option>
+          <option value="180">3:00</option>
+          <option value="300" selected>5:00</option>
+        </select>
+      </label>
+      <button id="popup-go" type="button" onclick="closePopup()">Let's haunt</button>
+      <div class="popup-x" onclick="closePopup()">&times;</div>
     </div>
   </body>
 
