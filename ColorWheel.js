@@ -112,6 +112,30 @@ class ColorWheel {
         );
     }
 
+    setRgbColor(red, green, blue) {
+        const normalizedRed = red / 255;
+        const normalizedGreen = green / 255;
+        const normalizedBlue = blue / 255;
+        const maximum = Math.max(normalizedRed, normalizedGreen, normalizedBlue);
+        const minimum = Math.min(normalizedRed, normalizedGreen, normalizedBlue);
+        const delta = maximum - minimum;
+
+        this.brightness = maximum * 100;
+        this.saturation = maximum === 0 ? 0 : delta / maximum * 100;
+
+        if (delta === 0) {
+            this.hue = 0;
+        } else if (maximum === normalizedRed) {
+            this.hue = (60 * ((normalizedGreen - normalizedBlue) / delta) + 360) % 360;
+        } else if (maximum === normalizedGreen) {
+            this.hue = 60 * ((normalizedBlue - normalizedRed) / delta + 2);
+        } else {
+            this.hue = 60 * ((normalizedRed - normalizedGreen) / delta + 4);
+        }
+
+        this.update();
+    }
+
     static rgbToHex(rgb) {
         return "#" + [rgb.red, rgb.green, rgb.blue]
             .map((channel) => channel.toString(16).padStart(2, "0"))

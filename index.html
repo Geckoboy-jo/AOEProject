@@ -16,7 +16,9 @@
       <button id="clear">CLEAR</button>
       <button id="save">SAVE PNG</button>
       <button id="back">BACK</button>
+      <button id="dropper" type="button" aria-pressed="false">DROPPER</button>
     </div>
+    <output id="dropper-status" aria-live="polite"></output>
     <output id="save-status" aria-live="polite"></output>
     <section id="color-picker-panel" class="color-picker" aria-label="Drawing color controls">
       <canvas id="color-wheel" width="240" height="240" aria-label="Color wheel"></canvas>
@@ -30,6 +32,7 @@
         <output id="selected-color" aria-live="polite"></output>
       </div>
     </section>
+
     <!-- Popup at the start -->
     <div onclick="closePopup()" id="outer-popup"></div>
     <div id="onstart-popup">

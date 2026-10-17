@@ -17,6 +17,8 @@ const createCanvas = () =>{
         const saveBtn = document.getElementById('save');
         const saveStatus = document.getElementById('save-status');
         const backBtn = document.getElementById('back');
+        const dropperBtn = document.getElementById('dropper');
+        const dropperStatus = document.getElementById('dropper-status');
         let canvasHeight = window.innerHeight-100;
         let canvasWidth  = window.innerWidth-100;
         var paint;
@@ -50,7 +52,7 @@ const createCanvas = () =>{
                   document.getElementById('brightness')
                 );
 
-                new ColorWheel(
+                const colorWheel = new ColorWheel(
                   document.getElementById('color-wheel'),
                   colorSliders,
                   document.getElementById('selected-color'),
@@ -121,7 +123,37 @@ const createCanvas = () =>{
                 });
 
 
+                  dropperBtn.addEventListener('click', () => {
+                    const active = dropperBtn.getAttribute('aria-pressed') !== 'true';
+                    dropperBtn.setAttribute('aria-pressed', active);
+                    dropperStatus.textContent = active
+                      ? 'Click the canvas to sample a color.'
+                      : '';
+                  });
+
                   canvas.addEventListener('mousedown',function(e){
+                    if (dropperBtn.getAttribute('aria-pressed') === 'true') {
+                      const bounds = canvas.getBoundingClientRect();
+                      const scaleX = canvas.width / bounds.width;
+                      const scaleY = canvas.height / bounds.height;
+                      const x = Math.max(0, Math.min(
+                        canvas.width - 1,
+                        Math.floor((e.clientX - bounds.left) * scaleX)
+                      ));
+                      const y = Math.max(0, Math.min(
+                        canvas.height - 1,
+                        Math.floor((e.clientY - bounds.top) * scaleY)
+                      ));
+                      const pixel = context.getImageData(x, y, 1, 1).data;
+
+                      colorWheel.setRgbColor(pixel[0], pixel[1], pixel[2]);
+                      paint = false;
+                      currentAction = undefined;
+                      dropperBtn.setAttribute('aria-pressed', 'false');
+                      dropperStatus.textContent = 'Color sampled.';
+                      return;
+                    }
+
                     paint = true;
                     currentAction = { color, points: [] };
                     artWrapper.addAction(currentAction);

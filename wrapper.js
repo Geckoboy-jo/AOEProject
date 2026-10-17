@@ -3,6 +3,7 @@ class Wrapper
     constructor()
     {
         this.actionStack = new Stack();
+        
     }
 
     addAction(action)
