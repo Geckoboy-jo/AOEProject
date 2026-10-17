@@ -2,14 +2,15 @@ console.log("starting the app!");
 
 const artWrapper = new Wrapper();
 
+// how-to-play dialog (markup in index.html, behavior in howToPlay.js)
 const closePopup = () => {
-    document.querySelector("#onstart-popup").style.display = "none";
-    document.querySelector("#outer-popup").style.display = "none";
+    const dialog = document.getElementById("how-to-play");
+    if (dialog && dialog.open) dialog.close();
 };
 
 const openPopup = () => {
-    document.querySelector("#onstart-popup").style.display = "block";
-    document.querySelector("#outer-popup").style.display = "block";
+    const dialog = document.getElementById("how-to-play");
+    if (dialog && !dialog.open) dialog.showModal();
 };
 
 const CANVAS_BG = "#ffffff";

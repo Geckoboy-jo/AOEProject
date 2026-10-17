@@ -12,7 +12,7 @@
     <div id="app">
       <!-- top: settings gear, title banner, timer + round controls -->
       <header id="top-bar">
-        <button id="settings-btn" class="icon-btn" type="button" title="Settings / how to play" aria-label="Settings">⚙️</button>
+        <button id="settings-btn" class="icon-btn" type="button" title="How to play / settings" aria-label="How to play and settings">⚙️</button>
         <div class="title-block">
           <h1 class="banner"><span>GHOULLE</span></h1>
           <div id="round-timer" aria-live="polite">5:00</div>
@@ -78,26 +78,69 @@
       </main>
     </div>
 
-    <!-- settings / how-to-play popup (opens on load and from the gear) -->
-    <div onclick="closePopup()" id="outer-popup"></div>
-    <div id="onstart-popup" role="dialog" aria-labelledby="popup-title">
-      <h2 id="popup-title">Ghoulle 🎃</h2>
-      <p>
-        Pick <b>🍬 Treat</b> for a spooky image or <b>🎭 Trick</b> for a
-        cheeky curveball. It flashes for 3 seconds, then draw it from memory
-        before the timer runs out.
-      </p>
-      <label class="setting">
-        Drawing time
-        <select id="round-length">
-          <option value="60">1:00</option>
-          <option value="180">3:00</option>
-          <option value="300" selected>5:00</option>
-        </select>
-      </label>
-      <button id="popup-go" type="button" onclick="closePopup()">Let's haunt</button>
-      <div class="popup-x" onclick="closePopup()">&times;</div>
-    </div>
+    <!-- how-to-play / settings dialog: opens on load (unless dismissed) and from the gear -->
+    <dialog id="how-to-play" aria-labelledby="htp-title">
+      <button class="htp-close" type="button" aria-label="Close" data-close>&times;</button>
+
+      <header class="htp-head">
+        <h2 id="htp-title">Welcome to Ghoulle 🎃</h2>
+        <p class="htp-tagline">See it for 3 seconds. Draw it from memory.</p>
+      </header>
+
+      <ol class="htp-steps">
+        <li>
+          <span class="htp-icon" aria-hidden="true">🍬🎭</span>
+          <b>Trick or treat?</b>
+          <span><b>Treat</b> gets you something spooky. <b>Trick</b> gets you something cheeky.</span>
+        </li>
+        <li>
+          <span class="htp-icon" aria-hidden="true">👀</span>
+          <b>Memorize it</b>
+          <span>The image flashes for just 3 seconds. Don't blink.</span>
+        </li>
+        <li>
+          <span class="htp-icon" aria-hidden="true">✏️</span>
+          <b>Draw it</b>
+          <span>Recreate it before the timer runs out.</span>
+        </li>
+        <li>
+          <span class="htp-icon" aria-hidden="true">👻</span>
+          <b>The reveal</b>
+          <span>See your drawing next to the real thing. Hit Reveal early if you're done.</span>
+        </li>
+      </ol>
+
+      <details class="htp-tips">
+        <summary>Drawing tips</summary>
+        <ul>
+          <li><b>Ctrl/⌘ + Z</b> undoes your last stroke.</li>
+          <li>🪣 <b>Bucket fill</b> colors in a whole shape.</li>
+          <li><b>Background / Foreground</b> picks whether you draw behind or in front.</li>
+          <li>💧 <b>Dropper</b> picks a color from your drawing.</li>
+        </ul>
+      </details>
+
+      <div class="htp-settings">
+        <label>
+          Drawing time
+          <select id="round-length">
+            <option value="60">1:00</option>
+            <option value="180">3:00</option>
+            <option value="300" selected>5:00</option>
+          </select>
+        </label>
+        <label class="htp-dontshow">
+          <input type="checkbox" id="htp-dontshow" />
+          Don't show this on startup
+        </label>
+      </div>
+
+      <div class="htp-actions">
+        <button type="button" class="htp-start" data-category="treat" autofocus>🍬 Treat</button>
+        <button type="button" class="htp-start" data-category="trick">🎭 Trick</button>
+        <button type="button" class="htp-secondary" data-close>Just let me doodle</button>
+      </div>
+    </dialog>
   </body>
 
   <script src="js/stack.js"></script>
@@ -113,4 +156,5 @@
   <script src="assets/unsplash/cache.js" onerror="console.info('No image cache, using the live API or emoji')"></script>
   <script src="js/imageApi.js"></script>
   <script src="js/game.js"></script>
+  <script src="js/howToPlay.js"></script>
 </html>
