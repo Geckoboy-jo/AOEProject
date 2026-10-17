@@ -51,6 +51,7 @@ const Game = (() => {
   function setScreen(next) {
     screen = next;
     document.body.dataset.screen = next;
+    syncHeader(); // the logo changes size per screen
     // the canvas was laid out while hidden; nudge it to re-fit
     if (next === "draw") window.dispatchEvent(new Event("resize"));
   }
@@ -225,9 +226,10 @@ const Game = (() => {
   }
 
   // the header's height depends on the logo; screens size themselves from it
-  const header = document.getElementById("top-bar");
-  const syncHeader = () =>
-    header && document.documentElement.style.setProperty("--header-h", `${header.offsetHeight}px`);
+  function syncHeader() {
+    const header = document.getElementById("top-bar");
+    if (header) document.documentElement.style.setProperty("--header-h", `${header.offsetHeight}px`);
+  }
   window.addEventListener("resize", syncHeader);
   window.addEventListener("load", syncHeader);
   syncHeader();
