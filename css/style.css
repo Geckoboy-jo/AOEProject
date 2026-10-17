@@ -133,11 +133,6 @@ html, body {
   outline-offset: 2px;
 }
 
-#brush-size-value {
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-}
-
 #brush-size {
   writing-mode: vertical-lr;
   direction: rtl; /* larger size at the top */

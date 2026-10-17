@@ -184,7 +184,6 @@ const createCanvas = () => {
     // during setup, before this part of createCanvas has run)
     function renderBrushPreview() {
         const brushPreview = document.getElementById("brush-preview");
-        const brushSizeValue = document.getElementById("brush-size-value");
         if (!brushPreview) return;
         const d = strokeWidth();
         const erasing = tool === "eraser";
@@ -192,7 +191,6 @@ const createCanvas = () => {
         brushPreview.style.height = `${d}px`;
         brushPreview.style.background = erasing ? CANVAS_BG : color;
         brushPreview.classList.toggle("eraser", erasing);
-        if (brushSizeValue) brushSizeValue.textContent = `${d}px`;
 
         // canvas cursor: a ring the size of the brush (crosshair for fill / dropper)
         if (tool === "brush" || tool === "eraser") {
