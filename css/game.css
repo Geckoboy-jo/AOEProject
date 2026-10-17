@@ -55,6 +55,13 @@ body[data-screen="draw"] #draw-footer { display: flex; }
 }
 
 /* ---- 1) start ---- */
+.name-field { display: flex; flex-direction: column; gap: 4px; margin: 8px 0; }
+.name-field input { padding: 6px 8px; font: inherit; }
+.scoreboard { margin: 8px 0; text-align: left; }
+.scoreboard h3 { margin: 0 0 4px; font-size: 1em; }
+.scoreboard ol { margin: 0; padding-left: 1.5em; }
+.scoreboard p { margin: 0; opacity: 0.7; }
+
 .start-card {
   width: min(620px, 100%);
   padding: 24px;

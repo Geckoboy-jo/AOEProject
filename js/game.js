@@ -52,6 +52,22 @@ const Game = (() => {
   }
   renderStreak();
 
+  // ---------- player name + scoreboards ----------
+  const nameInput = $("player-name");
+  try {
+    nameInput.value = localStorage.getItem("ghoulle-name") || "";
+  } catch (err) {}
+  const playerName = () => nameInput.value.trim() || "Anonymous";
+  nameInput.addEventListener("input", () => {
+    try {
+      localStorage.setItem("ghoulle-name", nameInput.value.trim());
+    } catch (err) {}
+  });
+  function renderStreakBoard() {
+    Scoreboard.render($("streak-board"), "Top 10 streaks", Scoreboard.topStreaks(), "streak");
+  }
+  Scoreboard.ready.then(renderStreakBoard);
+
   // ---------- helpers ----------
   function fmt(sec) {
     const s = Math.max(0, Math.ceil(sec));
@@ -120,6 +136,8 @@ const Game = (() => {
     busy = false;
     timerEl.textContent = "";
     setScreen("start");
+    renderStreakBoard();
+    nameInput.focus();
   }
 
   // ---------- 2) preview ----------
@@ -216,8 +234,14 @@ const Game = (() => {
     $("results-score-msg").textContent = scoreMessage(result.score);
     streak = result.score >= STREAK_MIN ? streak + 1 : 0;
     renderStreak();
-    const streakMsg = $("results-streak-msg");
-    streakMsg.hidden = result.score < STREAK_MIN;
+    await Scoreboard.ready;
+    const key = Scoreboard.imageKey(item);
+    const name = playerName();
+    Scoreboard.addAccuracy(key, name, result.score);
+    Scoreboard.addStreak(name, streak);
+    Scoreboard.render($("image-board"), "Top 10 for this image", Scoreboard.topAccuracies(key),     "accuracy", "%");
+        const streakMsg = $("results-streak-msg");
+        streakMsg.hidden = result.score < STREAK_MIN;
     streakMsg.textContent = `🔥 Streak increased by 1! (${streak} in a row)`;
     box.hidden = false;
   }
