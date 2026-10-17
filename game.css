@@ -121,3 +121,9 @@ body > #round-bar {
 .credit a {
   color: #ffd9a8;
 }
+
+/* the category picked for the current round */
+#round-bar .round-start.active {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}

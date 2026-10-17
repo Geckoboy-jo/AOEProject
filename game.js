@@ -1,5 +1,8 @@
-// game.js — round flow: flash a random image for 3s, draw it before the
-// timer runs out, then reveal it next to your drawing.
+// game.js — round flow: pick Trick or Treat, flash a random image for 3s,
+// draw it before the timer runs out, then reveal it next to your drawing.
+//
+// Hooks for other UI: Game.startRound("trick" | "treat" | "either"),
+// Game.showReveal(), Game.category (the last one picked).
 
 const Game = (() => {
   const SHOW_MS = 3000;
@@ -9,8 +12,9 @@ const Game = (() => {
   const bar = document.createElement("div");
   bar.id = "round-bar";
   bar.innerHTML = `
-    <span id="round-status">Ready when you are 🎃</span>
-    <button id="new-round" type="button">New round</button>
+    <span id="round-status">Trick or treat? 🎃</span>
+    <button id="round-trick" class="round-start" data-category="trick" type="button" title="Cheeky curveball images">🎭 Trick</button>
+    <button id="round-treat" class="round-start" data-category="treat" type="button" title="Spooky Halloween images">🍬 Treat</button>
     <button id="reveal" type="button" disabled>Reveal</button>`;
 
   const flash = document.createElement("div");
@@ -46,12 +50,14 @@ const Game = (() => {
 
   const $ = (id) => document.getElementById(id);
   const statusEl = $("round-status");
-  const newBtn = $("new-round");
+  const startBtns = [...bar.querySelectorAll(".round-start")];
+  const setStartDisabled = (d) => startBtns.forEach((b) => (b.disabled = d));
   const revealBtn = $("reveal");
   const timerEl = $("round-timer"); // optional, lives in the header
   const lengthSelect = $("round-length"); // optional, lives in settings
 
   let current = null;
+  let category = "either";
   let busy = false;
   let drawTimer = null;
   let deadline = 0;
@@ -105,22 +111,24 @@ const Game = (() => {
       on <a href="${item.credit.unsplash}" target="_blank" rel="noopener">Unsplash</a>`;
   }
 
-  async function startRound() {
+  async function startRound(pickedCategory = category) {
     if (busy) return;
     busy = true;
+    category = pickedCategory;
+    startBtns.forEach((b) => b.classList.toggle("active", b.dataset.category === category));
     stopDrawTimer();
     showTime(roundSeconds());
     reveal.hidden = true;
-    newBtn.disabled = true;
+    setStartDisabled(true);
     revealBtn.disabled = true;
-    statusEl.textContent = "Summoning… 🔮";
+    statusEl.textContent = category === "trick" ? "Conjuring a trick… 🎭" : category === "treat" ? "Unwrapping a treat… 🍬" : "Summoning… 🔮";
 
     try {
-      current = await ImageApi.next();
+      current = await ImageApi.next(category);
     } catch (err) {
       console.error(err);
       statusEl.textContent = "No image. Try again?";
-      newBtn.disabled = false;
+      setStartDisabled(false);
       busy = false;
       return;
     }
@@ -148,7 +156,7 @@ const Game = (() => {
       clearInterval(timer);
       flash.hidden = true;
       statusEl.textContent = "Draw it! ✏️";
-      newBtn.disabled = false;
+      setStartDisabled(false);
       revealBtn.disabled = false;
       busy = false;
       startDrawTimer();
@@ -159,7 +167,8 @@ const Game = (() => {
     if (!current) return;
     stopDrawTimer();
     const canvas = $("canvas");
-    $("reveal-title").textContent = timedOut ? "Time's up! Trick or treat? 👻" : "Trick or treat? 👻";
+    const label = current.category === "trick" ? "It was a trick! 🎭" : "Here's your treat! 🍬";
+    $("reveal-title").textContent = timedOut ? `Time's up! ${label}` : label;
     $("reveal-original").src = current.src;
     $("reveal-original").alt = current.alt;
     $("reveal-prompt").textContent = `The real thing (${current.prompt})`;
@@ -168,10 +177,16 @@ const Game = (() => {
     reveal.hidden = false;
   }
 
-  newBtn.addEventListener("click", startRound);
+  startBtns.forEach((b) => b.addEventListener("click", () => startRound(b.dataset.category)));
   revealBtn.addEventListener("click", () => showReveal(false));
-  $("reveal-next").addEventListener("click", startRound);
+  $("reveal-next").addEventListener("click", () => startRound());
   $("reveal-close").addEventListener("click", () => (reveal.hidden = true));
 
-  return { startRound, showReveal };
+  return {
+    startRound,
+    showReveal,
+    get category() {
+      return category;
+    },
+  };
 })();
