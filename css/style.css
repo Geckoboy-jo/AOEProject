@@ -14,16 +14,20 @@
    +------+---------------------------------+---------+
 */
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
-html, body {
+html,
+body {
   margin: 0;
   height: 100%;
   font-family: Arial, sans-serif;
 }
 
 body {
-  background: #1b1026 url("../assets/ui/ui-backdrop.GIF") center / cover no-repeat fixed;
+  background: #1b1026 url("../assets/ui/ui-backdrop.GIF") center / cover
+    no-repeat fixed;
   image-rendering: pixelated;
 }
 
@@ -39,10 +43,13 @@ body {
 }
 
 @media (max-height: 800px) {
-  .logo { height: 82px; } /* 2x */
+  .logo {
+    height: 82px;
+  } /* 2x */
 }
 
-#toolbar, #color-picker-panel {
+#toolbar,
+#color-picker-panel {
   background: transparent;
   color: #fff;
   text-shadow: 0 1px 3px #000;
@@ -65,12 +72,15 @@ body {
   align-items: center;
   gap: 12px;
   padding: 8px 16px;
-  border-bottom: 1px solid #ccc;
 }
 
-#settings-btn { justify-self: start; }
+#settings-btn {
+  justify-self: start;
+}
 
-.title-block { text-align: center; }
+.title-block {
+  text-align: center;
+}
 
 .banner {
   margin: 0;
@@ -82,9 +92,13 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-#round-timer.urgent { color: red; }
+#round-timer.urgent {
+  color: red;
+}
 
-#round-slot { justify-self: end; }
+#round-slot {
+  justify-self: end;
+}
 
 /* ---- 3-column workspace ---- */
 #workspace {
@@ -101,7 +115,6 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  border: 1px solid #ccc;
   padding: 8px 0;
 }
 
@@ -113,7 +126,9 @@ body {
   cursor: pointer;
 }
 
-.tool.active { outline: 2px solid #fff; }
+.tool.active {
+  outline: 2px solid #fff;
+}
 
 /* icon buttons: one shared background image + a separate icon image per button */
 :root {
@@ -147,7 +162,10 @@ body {
 .icon-pencil   { --icon: url("../assets/ui/ui-icon-pen.png"); }
 .icon-bucket   { --icon: url("../assets/ui/ui-icon-paintbucket.png"); }
 
-#save-status { font-size: 11px; text-align: center; }
+#save-status {
+  font-size: 11px;
+  text-align: center;
+}
 
 /* center canvas: script.js sizes the <canvas> to fill #canvasDiv */
 #canvas-frame {
@@ -208,7 +226,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  border: 1px solid #ccc;
   padding: 10px;
   overflow-y: auto;
 }
@@ -251,7 +268,16 @@ body {
 }
 
 #hue {
-  background: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+  background: linear-gradient(
+    to right,
+    #f00,
+    #ff0,
+    #0f0,
+    #0ff,
+    #00f,
+    #f0f,
+    #f00
+  );
 }
 
 #dropper-status {
@@ -268,7 +294,10 @@ body {
   font-size: 12px;
 }
 
-.panel-label { font-size: 12px; font-weight: bold; }
+.panel-label {
+  font-size: 12px;
+  font-weight: bold;
+}
 
 #brush-sizes {
   display: flex;
@@ -291,7 +320,9 @@ body {
   background: #000;
 }
 
-#brush-sizes button.active { outline: 2px solid #333; }
+#brush-sizes button.active {
+  outline: 2px solid #333;
+}
 
 #swatches {
   display: grid;
@@ -312,7 +343,10 @@ body {
   cursor: pointer;
 }
 
-#layer-toggle button.active { outline: 2px solid #fff; font-weight: bold; }
+#layer-toggle button.active {
+  outline: 2px solid #fff;
+  font-weight: bold;
+}
 
 .slot {
   flex: 1;
@@ -321,7 +355,10 @@ body {
   cursor: pointer;
 }
 
-.slot.active { outline: 3px solid #fff; outline-offset: 1px; }
+.slot.active {
+  outline: 3px solid #fff;
+  outline-offset: 1px;
+}
 
 .swatch {
   aspect-ratio: 1;
@@ -355,7 +392,6 @@ body {
   cursor: pointer;
 }
 
-
 .htp-steps {
   list-style: none;
   counter-reset: step;
@@ -387,9 +423,15 @@ body {
   opacity: 0.35;
 }
 
-.htp-tips { margin-bottom: 16px; font-size: 14px; }
+.htp-tips {
+  margin-bottom: 16px;
+  font-size: 14px;
+}
 
-.settings-actions button { padding: 6px 14px; cursor: pointer; }
+.settings-actions button {
+  padding: 6px 14px;
+  cursor: pointer;
+}
 
 #settings-dialog .setting {
   display: flex;
@@ -403,27 +445,46 @@ body {
   justify-content: flex-end;
   gap: 8px;
 }
-.htp-tips summary { cursor: pointer; font-weight: bold; }
-.htp-tips ul { margin: 8px 0 0; padding-left: 20px; }
-
-
-
-
+.htp-tips summary {
+  cursor: pointer;
+  font-weight: bold;
+}
+.htp-tips ul {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
 
 @media (max-width: 480px) {
-  .htp-steps { grid-template-columns: 1fr; }
+  .htp-steps {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ---- narrow screens: stack tools / canvas / colors ---- */
 @media (max-width: 800px) {
-  #app { height: auto; min-height: 100vh; }
+  #app {
+    height: auto;
+    min-height: 100vh;
+  }
 
-  #top-bar { grid-template-columns: auto 1fr; }
-  #round-slot { grid-column: 1 / -1; justify-self: center; }
+  #top-bar {
+    grid-template-columns: auto 1fr;
+  }
+  #round-slot {
+    grid-column: 1 / -1;
+    justify-self: center;
+  }
 
-  #workspace { grid-template-columns: 1fr; }
+  #workspace {
+    grid-template-columns: 1fr;
+  }
 
-  #toolbar { flex-direction: row; justify-content: center; }
+  #toolbar {
+    flex-direction: row;
+    justify-content: center;
+  }
 
-  #canvas-frame { height: 60vh; }
+  #canvas-frame {
+    height: 60vh;
+  }
 }

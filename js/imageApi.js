@@ -1,8 +1,8 @@
 // imageApi.js — pulls random "trick or treat" images for each round.
 //
 // Where images come from, in order:
-//   1. assets/unsplash/cache.js (built by scripts/build-image-cache.js): zero
-//      API calls; uses the downloaded file, or the Unsplash URL if it's missing
+//   1. assets/pixabay/cache.js (built by scripts/build-pixabay-cache.js):
+//      illustrations/clipart stored locally, zero API calls
 //   2. the live Unsplash API, if config.js has a key
 //   3. built-in emoji images, so the demo never breaks
 // Set APP_CONFIG.PREFER_LIVE_API = true in config.js to skip the cache.
@@ -77,7 +77,12 @@ const ImageApi = (() => {
         alt: p.alt,
         prompt: p.prompt,
         category,
-        credit: { name: p.credit.name, link: p.credit.link, unsplash: `https://unsplash.com/?${UTM}` },
+        credit: {
+          name: p.credit.name,
+          link: p.credit.link,
+          site: p.credit.site || "Unsplash",
+          siteLink: p.credit.siteLink || `https://unsplash.com/?${UTM}`,
+        },
         source: "cache",
       });
     }
@@ -137,7 +142,8 @@ const ImageApi = (() => {
       credit: {
         name: p.user.name,
         link: `${p.user.links.html}?${UTM}`,
-        unsplash: `https://unsplash.com/?${UTM}`,
+        site: "Unsplash",
+        siteLink: `https://unsplash.com/?${UTM}`,
       },
       source: "unsplash",
     }));

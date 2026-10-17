@@ -82,8 +82,10 @@ const Game = (() => {
   function creditHTML(item) {
     if (!item || !item.credit) return "";
     const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-    return `Photo by <a href="${esc(item.credit.link)}" target="_blank" rel="noopener">${esc(item.credit.name)}</a>
-      on <a href="${esc(item.credit.unsplash)}" target="_blank" rel="noopener">Unsplash</a>`;
+    const c = item.credit;
+    const site = c.site || "Unsplash";
+    return `Image by <a href="${esc(c.link)}" target="_blank" rel="noopener">${esc(c.name)}</a>
+      on <a href="${esc(c.siteLink || c.unsplash || "#")}" target="_blank" rel="noopener">${esc(site)}</a>`;
   }
 
   // ---------- 1) start ----------
