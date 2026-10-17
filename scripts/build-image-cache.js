@@ -15,7 +15,7 @@
 // Usage:   node scripts/build-image-cache.js            (adds to existing cache)
 //          node scripts/build-image-cache.js --fresh    (start over)
 //          node scripts/build-image-cache.js --images-only  (just download missing files, 0 API calls)
-// Key:     read from config.js, or set UNSPLASH_ACCESS_KEY in your env.
+// Key:     read from js/config.js, or set UNSPLASH_ACCESS_KEY in your env.
 // Cost:    1 API request per query (30 photos each).
 
 const fs = require("fs");
@@ -39,7 +39,7 @@ function loadBrowserScript(file, globalName) {
 
 function accessKey() {
   if (process.env.UNSPLASH_ACCESS_KEY) return process.env.UNSPLASH_ACCESS_KEY;
-  const cfg = loadBrowserScript(path.join(ROOT, "config.js"), "APP_CONFIG");
+  const cfg = loadBrowserScript(path.join(ROOT, "js", "config.js"), "APP_CONFIG");
   return cfg && cfg.UNSPLASH_ACCESS_KEY;
 }
 
@@ -89,11 +89,11 @@ async function main() {
 
   const key = accessKey();
   if (!key) {
-    console.error("No Unsplash key. Put it in config.js (see config.example.js) or set UNSPLASH_ACCESS_KEY.");
+    console.error("No Unsplash key. Put it in js/config.js (see js/config.example.js) or set UNSPLASH_ACCESS_KEY.");
     process.exit(1);
   }
 
-  const groups = require(path.join(ROOT, "queries.js"));
+  const groups = require(path.join(ROOT, "js", "queries.js"));
   const queries = Object.entries(groups).flatMap(([category, list]) =>
     list.map((query) => ({ category, query }))
   );

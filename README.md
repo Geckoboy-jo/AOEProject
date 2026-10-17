@@ -23,7 +23,7 @@ Click **New round**: a random image flashes for 3 seconds, then you draw it from
 
 **Images (Unsplash):**
 1. Create an app at https://unsplash.com/developers and copy its **Access Key**.
-2. `cp config.example.js config.js` and paste the key in. `config.js` is gitignored.
-3. Search terms live in the `QUERIES` list at the top of `imageApi.js`.
+2. `cp js/config.example.js js/config.js` and paste the key in. `js/config.js` is gitignored.
+3. Search terms live in `js/queries.js`, split into `treat` (spooky) and `trick` (cheeky). Run `node scripts/build-image-cache.js` to cache photos locally so you don't hit the rate limit.
 
 With no key (or if Unsplash rate-limits us: demo apps get 50 requests/hour), it falls back to built-in emoji images so the game still works. Each API call fetches 10 images, so 50 requests is about 500 rounds.
