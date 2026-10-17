@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="utf-8" />
     <title>SketchToPhoto</title>
     <link type="text/css" rel="stylesheet" href="style.css" />
+    <link type="text/css" rel="stylesheet" href="game.css" />
   </head>
 
   <body>
@@ -43,4 +45,8 @@
   <script src="stack.js"></script>
   <script src="wrapper.js"></script>
   <script src="script.js"></script>
+  <!-- config.js is gitignored: copy config.example.js and add your Unsplash key -->
+  <script src="config.js" onerror="console.info('No config.js, using emoji images')"></script>
+  <script src="imageApi.js"></script>
+  <script src="game.js"></script>
 </html>
