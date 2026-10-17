@@ -230,7 +230,8 @@ const createCanvas = () => {
     });
 
     document.addEventListener("keydown", (e) => {
-        if (e.key !== "Backspace" || paint) return;
+        const isUndoShortcut = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z";
+        if ((e.key !== "Backspace" && !isUndoShortcut) || paint) return;
         const t = e.target;
         if (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
         e.preventDefault();
