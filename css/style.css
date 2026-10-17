@@ -27,23 +27,18 @@ body {
   image-rendering: pixelated;
 }
 
-/* Logo is 127x41 pixel art. Only ever shrink it, in whole-number steps
-   (4x / 3x / 2x) so every pixel stays the same size. Smaller while
-   previewing/drawing (see game.css). */
+/* Logo is 127x41 pixel art. Same size on every screen; only shrinks on
+   short windows, in whole-number steps so every pixel stays the same size. */
 .logo {
   display: block;
-  height: 164px; /* 4x */
+  height: 123px; /* 3x */
   width: auto;
   image-rendering: pixelated;
   max-width: 100%;
   margin: 0 auto;
 }
 
-@media (max-height: 900px) {
-  .logo { height: 123px; } /* 3x */
-}
-
-@media (max-height: 700px) {
+@media (max-height: 800px) {
   .logo { height: 82px; } /* 2x */
 }
 

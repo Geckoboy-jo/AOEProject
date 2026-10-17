@@ -35,12 +35,6 @@ body:not([data-screen="draw"]) #round-slot {
   visibility: hidden;
 }
 
-/* smaller logo while the image and canvas need the room */
-body[data-screen="preview"] .logo,
-body[data-screen="draw"] .logo {
-  height: 82px; /* 2x */
-}
-
 /* keep the timer's line reserved so the header doesn't jump between screens */
 #round-timer {
   min-height: 1.2em;
