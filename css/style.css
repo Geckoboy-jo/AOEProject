@@ -46,6 +46,13 @@ body {
   .logo {
     height: 82px;
   } /* 2x */
+  #workspace { padding: 6px 12px; }
+}
+
+@media (max-height: 640px) {
+  .logo {
+    height: 41px;
+  } /* 1x */
 }
 
 #toolbar,
@@ -61,8 +68,29 @@ body {
 
 #app {
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto minmax(0, 1fr);
   height: 100vh;
+  overflow: hidden;
+}
+
+#streak {
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  text-shadow: 0 1px 3px #000;
+  white-space: nowrap;
+}
+
+#canvas-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+#draw-footer {
+  justify-content: center;
+  padding-top: 6px;
 }
 
 /* ---- header ---- */
@@ -170,9 +198,10 @@ body {
 /* center canvas: script.js sizes the <canvas> to fill #canvasDiv */
 #canvas-frame {
   position: relative;
+  flex: 1;
   min-width: 0;
   min-height: 0;
-  margin: 4% 6%;
+  margin: 0 6%;
   border: 1px solid #333;
 }
 
@@ -217,7 +246,7 @@ body {
 #brush-size {
   writing-mode: vertical-lr;
   direction: rtl; /* larger size at the top */
-  height: 140px;
+  height: clamp(60px, 16vh, 140px);
   width: 24px;
   cursor: pointer;
 }
@@ -225,14 +254,15 @@ body {
 #color-picker-panel {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 10px;
+  gap: 5px;
+  padding: 8px 10px;
   overflow-y: auto;
+  min-height: 0;
 }
 
 #color-wheel {
   width: 100%;
-  max-width: 200px;
+  max-width: min(200px, 24vh);
   aspect-ratio: 1;
   align-self: center;
   border-radius: 50%;
@@ -326,8 +356,8 @@ body {
 
 #swatches {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
 }
 
 #layer-toggle,
@@ -485,6 +515,7 @@ body {
   }
 
   #canvas-frame {
+    flex: none;
     height: 60vh;
   }
 }

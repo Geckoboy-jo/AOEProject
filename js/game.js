@@ -28,7 +28,7 @@ const Game = (() => {
   bar.innerHTML = `
     <span id="round-status"></span>
     <button id="round-done" type="button">Done</button>`;
-  ($("round-slot") || document.body).append(bar);
+  ($("draw-footer") || document.body).append(bar);
   const statusEl = $("round-status");
 
   let screen = "start";
@@ -36,6 +36,20 @@ const Game = (() => {
   let current = null; // the image for this round
   let timer = null;
   let busy = false;
+
+  // streak = consecutive rounds scoring at least STREAK_MIN
+  const STREAK_MIN = 50;
+  let streak = 0;
+  try {
+    streak = Number(localStorage.getItem("ghoulle-streak")) || 0;
+  } catch (err) {}
+  function renderStreak() {
+    $("streak-count").textContent = streak;
+    try {
+      localStorage.setItem("ghoulle-streak", streak);
+    } catch (err) {}
+  }
+  renderStreak();
 
   // ---------- helpers ----------
   function fmt(sec) {
@@ -174,6 +188,8 @@ const Game = (() => {
     if (current !== item || screen !== "results" || !result) return;
     $("results-score-num").textContent = result.score;
     $("results-score-msg").textContent = scoreMessage(result.score);
+    streak = result.score >= STREAK_MIN ? streak + 1 : 0;
+    renderStreak();
     box.hidden = false;
   }
 

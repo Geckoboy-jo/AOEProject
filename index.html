@@ -17,7 +17,9 @@
           <h1 class="banner"><img class="logo" src="assets/ui/ui-logo.png" alt="Ghoulle" /></h1>
           <div id="round-timer" aria-live="polite"></div>
         </div>
-        <div id="round-slot"></div>
+        <div id="round-slot">
+          <div id="streak" title="Rounds in a row scoring 50 or higher">🔥 Streak: <b id="streak-count">0</b></div>
+        </div>
       </header>
 
       <main id="workspace">
@@ -37,10 +39,13 @@
           <output id="save-status" aria-live="polite"></output>
         </aside>
 
-        <!-- center: the canvas (script.js creates the <canvas> in here) -->
-        <section id="canvas-frame">
-          <div id="canvasDiv"></div>
-        </section>
+        <!-- center: the canvas (script.js creates the <canvas> in here) + Done button -->
+        <div id="canvas-col">
+          <section id="canvas-frame">
+            <div id="canvasDiv"></div>
+          </section>
+          <div id="draw-footer"></div>
+        </div>
 
         <!-- right: color controls -->
         <aside id="color-picker-panel" class="color-picker" aria-label="Drawing color controls">

@@ -31,9 +31,8 @@ body:not([data-screen="draw"]) #workspace {
 }
 
 /* header pieces that only make sense while drawing */
-body:not([data-screen="draw"]) #round-slot {
-  visibility: hidden;
-}
+#draw-footer { display: none; }
+body[data-screen="draw"] #draw-footer { display: flex; }
 
 /* keep the timer's line reserved so the header doesn't jump between screens */
 #round-timer {
@@ -113,8 +112,8 @@ body:not([data-screen="draw"]) #round-slot {
 
 .preview-frame {
   width: 100%;
-  aspect-ratio: 1;
-  max-height: 60vh;
+  height: min(520px, calc(100vh - var(--header-h, 120px) - 230px));
+  min-height: 120px;
   display: grid;
   place-items: center;
   border: 1px solid #ddd;
