@@ -1,36 +1,18 @@
 // imageApi.js — pulls random "trick or treat" images for each round.
 //
-// Uses the Unsplash API when an access key is set in config.js.
-// Falls back to built-in emoji images when there's no key, no network,
-// or we hit the rate limit, so the demo never breaks.
+// Where images come from, in order:
+//   1. image-cache.js (built by scripts/build-image-cache.js): zero API calls
+//   2. the live Unsplash API, if config.js has a key
+//   3. built-in emoji images, so the demo never breaks
+// Set APP_CONFIG.PREFER_LIVE_API = true in config.js to skip the cache.
 //
 // Usage:  const img = await ImageApi.next();
 //         img = { src, alt, prompt, credit: { name, link } | null, source }
 
 const ImageApi = (() => {
-  // Edit these freely: each refill picks one at random.
-  const QUERIES = [
-    // treats (spooky)
-    "halloween cartoon",
-    "halloween illustration",
-    "jack o lantern",
-    "ghost illustration",
-    "witch hat",
-    "black cat halloween",
-    "bat illustration",
-    "skeleton cartoon",
-    "haunted house",
-    "candy corn",
-    "spider web",
-    // tricks (cheeky)
-    "dog in costume",
-    "cat in costume",
-    "rubber duck",
-    "funny monster",
-    "pizza slice",
-    "cactus",
-    "frog",
-  ];
+  // Search terms live in queries.js (shared with the cache builder).
+  const QUERIES =
+    typeof IMAGE_QUERIES !== "undefined" ? IMAGE_QUERIES : ["halloween illustration"];
 
   const BATCH_SIZE = 10;   // images per API call (Unsplash max is 30)
   const REFILL_AT = 3;     // fetch more when this many are left
@@ -48,6 +30,36 @@ const ImageApi = (() => {
   let queue = [];
   let refilling = null;
   let unsplashDisabled = false;
+  let cacheDeck = [];
+
+  const cachedPhotos = () =>
+    (window.IMAGE_CACHE && Array.isArray(window.IMAGE_CACHE.photos) && window.IMAGE_CACHE.photos) || [];
+
+  const preferLive = () => !!(window.APP_CONFIG && window.APP_CONFIG.PREFER_LIVE_API);
+
+  // Deal from a shuffled deck so you don't see repeats until the whole cache is used.
+  function cachedBatch() {
+    const photos = cachedPhotos();
+    const out = [];
+    while (out.length < Math.min(BATCH_SIZE, photos.length)) {
+      if (cacheDeck.length === 0) {
+        cacheDeck = [...photos];
+        for (let i = cacheDeck.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [cacheDeck[i], cacheDeck[j]] = [cacheDeck[j], cacheDeck[i]];
+        }
+      }
+      const p = cacheDeck.pop();
+      out.push({
+        src: p.src,
+        alt: p.alt,
+        prompt: p.prompt,
+        credit: { name: p.credit.name, link: p.credit.link, unsplash: `https://unsplash.com/?${UTM}` },
+        source: "cache",
+      });
+    }
+    return out;
+  }
 
   const accessKey = () =>
     (window.APP_CONFIG && window.APP_CONFIG.UNSPLASH_ACCESS_KEY) || "";
@@ -114,11 +126,15 @@ const ImageApi = (() => {
     if (refilling) return refilling;
     refilling = (async () => {
       let items;
-      if (accessKey() && !unsplashDisabled) {
+      const haveCache = cachedPhotos().length > 0;
+      if (haveCache && !preferLive()) {
+        items = cachedBatch();
+      } else if (accessKey() && !unsplashDisabled) {
         try {
           items = await fetchUnsplashBatch();
         } catch (err) {
-          console.warn("[ImageApi] falling back to emoji:", err.message);
+          console.warn("[ImageApi] live API failed:", err.message);
+          if (haveCache) items = cachedBatch();
         }
       }
       if (!items || items.length === 0) {
@@ -140,5 +156,9 @@ const ImageApi = (() => {
   // Warm the queue on page load so the first round is instant.
   refill();
 
-  return { next, refill };
+  const source = () =>
+    cachedPhotos().length && !preferLive() ? "cache" : accessKey() && !unsplashDisabled ? "live" : "emoji";
+  console.info(`[ImageApi] image source: ${source()} (${cachedPhotos().length} cached photos)`);
+
+  return { next, refill, source };
 })();
