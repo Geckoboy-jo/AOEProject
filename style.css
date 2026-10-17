@@ -20,7 +20,7 @@ body{
     text-align: center;
 }
 
-#clear , #save {
+#clear, #save, #back {
     line-height: 20px;
     border-radius:8px;
     text-align: center;
@@ -32,6 +32,10 @@ body{
 
 #save{
     background-color: green;
+}
+
+#back{
+    background-color: #555;
 }
 
 #savedImg

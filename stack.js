@@ -1,17 +1,21 @@
 class Stack {
     constructor() {
-        this.canvases = [];
-        this.top = undefined;
+        this.actions = [];
     }
 
-    push(canvas) {
-        this.canvases.push(canvas);
-        this.top = canvas;
+    push(action) {
+        this.actions.push(action);
     }
 
     pop() {
-        const canvas = this.canvases.pop();
-        this.top = this.canvases[this.canvases.length - 1];
-        return canvas;
+        return this.actions.pop();
+    }
+
+    clear() {
+        this.actions.length = 0;
+    }
+
+    get top() {
+        return this.actions[this.actions.length - 1];
     }
 }

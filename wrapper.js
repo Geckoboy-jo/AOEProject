@@ -2,26 +2,31 @@ class Wrapper
 {
     constructor()
     {
-        this.artStack = new Stack();
+        this.actionStack = new Stack();
     }
 
-    addCanvas(canvas)
+    addAction(action)
     {
-        if (!(canvas instanceof HTMLCanvasElement)) {
-            throw new TypeError("canvas must be an HTMLCanvasElement");
+        if (!action || !Array.isArray(action.points)) {
+            throw new TypeError("action must contain a points array");
         }
 
-        this.artStack.push(canvas);
-        return canvas;
+        this.actionStack.push(action);
+        return action;
     }
 
     back()
     {
-        return this.artStack.pop();
+        return this.actionStack.pop();
     }
 
-    get currentCanvas()
+    clear()
     {
-        return this.artStack.top;
+        this.actionStack.clear();
+    }
+
+    get actions()
+    {
+        return this.actionStack.actions;
     }
 }
