@@ -18,11 +18,30 @@
   box-sizing: border-box;
 }
 
+@font-face {
+  font-family: "Cairopixel";
+  src: url("../assets/cairopixel/Cairopixel.ttf") format("truetype");
+  font-display: swap;
+}
+
 html,
 body {
   margin: 0;
   height: 100%;
-  font-family: Arial, sans-serif;
+  font-family: "Cairopixel", Arial, sans-serif;
+}
+
+button,
+input,
+select,
+textarea,
+output,
+summary {
+  font-family: inherit;
+}
+
+h1, h2, h3, b, strong, th, summary, label, button, output, figcaption {
+  font-weight: normal;
 }
 
 body {
@@ -75,8 +94,7 @@ body {
 
 #streak {
   color: #fff;
-  font-size: 18px;
-  font-weight: bold;
+  font-size: 16px;
   text-shadow: 0 1px 3px #000;
   white-space: nowrap;
 }
@@ -116,7 +134,7 @@ body {
 }
 
 #round-timer {
-  font-size: 20px;
+  font-size: 32px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -150,7 +168,7 @@ body {
   min-width: 56px;
   height: 36px;
   padding: 0 8px;
-  font-size: 13px;
+  font-size: 16px;
   cursor: pointer;
 }
 
@@ -191,7 +209,7 @@ body {
 .icon-bucket   { --icon: url("../assets/ui/ui-icon-paintbucket.png"); }
 
 #save-status {
-  font-size: 11px;
+  font-size: 16px;
   text-align: center;
 }
 
@@ -278,7 +296,7 @@ body {
 #color-row .tool {
   width: 36px;
   height: 36px;
-  font-size: 18px;
+  font-size: 16px;
   flex: none;
 }
 
@@ -287,7 +305,7 @@ body {
   flex: 1;
   text-align: center;
   padding: 4px;
-  font-family: monospace;
+  font-family: inherit;
   border: 1px solid #333;
 }
 
@@ -313,7 +331,7 @@ body {
 #dropper-status {
   display: block;
   min-height: 1em;
-  font-size: 11px;
+  font-size: 16px;
   text-align: center;
 }
 
@@ -321,12 +339,11 @@ body {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  font-size: 12px;
+  font-size: 16px;
 }
 
 .panel-label {
-  font-size: 12px;
-  font-weight: bold;
+  font-size: 16px;
 }
 
 #brush-sizes {
@@ -369,13 +386,12 @@ body {
 #layer-toggle button {
   flex: 1;
   padding: 6px 2px;
-  font-size: 12px;
+  font-size: 16px;
   cursor: pointer;
 }
 
 #layer-toggle button.active {
   outline: 2px solid #fff;
-  font-weight: bold;
 }
 
 .slot {
@@ -417,7 +433,7 @@ body {
   right: 12px;
   border: 0;
   background: none;
-  font-size: 26px;
+  font-size: 32px;
   line-height: 1;
   cursor: pointer;
 }
@@ -441,7 +457,7 @@ body {
   padding: 12px 12px 12px 14px;
   border: 1px solid #ddd;
   border-radius: 10px;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .htp-steps li::before {
@@ -449,13 +465,12 @@ body {
   position: absolute;
   top: 10px;
   right: 12px;
-  font-weight: bold;
   opacity: 0.35;
 }
 
 .htp-tips {
   margin-bottom: 16px;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .settings-actions button {
@@ -477,7 +492,6 @@ body {
 }
 .htp-tips summary {
   cursor: pointer;
-  font-weight: bold;
 }
 .htp-tips ul {
   margin: 8px 0 0;
