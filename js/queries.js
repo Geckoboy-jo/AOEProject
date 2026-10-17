@@ -3,7 +3,7 @@
 // Re-run the cache builder after changing them.
 //
 //   treat = spooky Halloween things
-//   trick = cheeky, random curveballs
+//   trick = still Halloween, but odd and goofy (a twist on the spooky stuff)
 //
 // Results are illustrations/vector art, so simple one-subject terms work best.
 const IMAGE_QUERIES = {
@@ -24,20 +24,29 @@ const IMAGE_QUERIES = {
     "gravestone",
   ],
   trick: [
-    "funny dog",
-    "cat cartoon",
-    "rubber duck",
-    "cute monster",
-    "dinosaur cartoon",
-    "alien cartoon",
-    "pizza cartoon",
-    "taco",
-    "frog cartoon",
-    "sloth",
-    "octopus cartoon",
-    "robot cartoon",
-    "banana cartoon",
-    "llama",
+    "dog halloween costume",
+    "cat witch hat",
+    "dancing skeleton",
+    "skeleton dog",
+    "funny pumpkin",
+    "cute ghost",
+    "cute vampire",
+    "zombie cartoon",
+    "frankenstein cartoon",
+    "halloween monster cute",
+    "candy monster",
+    "cute bat",
+    "halloween frog",
+    "pumpkin cat",
+    "cute spider",
+    "ghost sheet",
+    "skeleton cartoon",
+    "witch cartoon",
+    "halloween costume animal",
+    "pumpkin face funny",
+    "halloween owl",
+    "cartoon mummy",
+    "halloween cupcake",
   ],
 };
 

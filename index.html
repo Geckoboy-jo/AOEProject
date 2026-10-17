@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Ghoulle</title>
+    <title>Ghoullge</title>
     <link type="text/css" rel="stylesheet" href="css/style.css" />
     <link type="text/css" rel="stylesheet" href="css/game.css" />
   </head>
@@ -12,51 +12,159 @@
     <div id="app">
       <!-- top: settings gear, title banner, timer + round controls -->
       <header id="top-bar">
-        <button id="settings-btn" class="icon-button icon-settings" type="button" title="Settings" aria-label="Settings"><span class="icon"></span></button>
+        <button
+          id="settings-btn"
+          class="icon-button icon-settings"
+          type="button"
+          title="Settings"
+          aria-label="Settings"
+        >
+          <span class="icon"></span>
+        </button>
         <div class="title-block">
-          <h1 class="banner"><img class="logo" src="assets/ui/ui-logo.png" alt="Ghoulle" /></h1>
+          <h1 class="banner">
+            <img class="logo" src="assets/ui/ui-logo.png" alt="Ghoulle" />
+          </h1>
           <div id="round-timer" aria-live="polite"></div>
         </div>
-        <div id="round-slot">
-          <div id="streak" title="Rounds in a row scoring 50 or higher">🔥 Streak: <b id="streak-count">0</b></div>
-        </div>
+        <div id="round-slot"></div>
       </header>
 
       <main id="workspace">
         <!-- left: actions + drawing tools + brush size -->
         <aside id="toolbar" aria-label="Canvas actions">
-          <button id="back" class="tool icon-button icon-back" type="button" title="Undo (Ctrl/⌘+Z)" aria-label="Undo"><span class="icon"></span></button>
-          <button id="clear" class="tool icon-button icon-clear" type="button" title="Clear canvas" aria-label="Clear canvas"><span class="icon"></span></button>
+          <button
+            id="back"
+            class="tool icon-button icon-back"
+            type="button"
+            title="Undo (Ctrl/⌘+Z)"
+            aria-label="Undo"
+          >
+            <span class="icon"></span>
+          </button>
+          <button
+            id="clear"
+            class="tool icon-button icon-clear"
+            type="button"
+            title="Clear canvas"
+            aria-label="Clear canvas"
+          >
+            <span class="icon"></span>
+          </button>
           <div id="draw-tools">
-            <button id="tool-brush" class="tool icon-button icon-pencil active" type="button" title="Brush" aria-label="Brush" aria-pressed="true"><span class="icon"></span></button>
-            <button id="tool-eraser" class="tool icon-button icon-erase" type="button" title="Eraser" aria-label="Eraser" aria-pressed="false"><span class="icon"></span></button>
-            <button id="tool-fill" class="tool icon-button icon-bucket" type="button" title="Bucket fill" aria-label="Bucket fill" aria-pressed="false"><span class="icon"></span></button>
+            <button
+              id="tool-brush"
+              class="tool icon-button icon-pencil active"
+              type="button"
+              title="Brush"
+              aria-label="Brush"
+              aria-pressed="true"
+            >
+              <span class="icon"></span>
+            </button>
+            <button
+              id="tool-eraser"
+              class="tool icon-button icon-erase"
+              type="button"
+              title="Eraser"
+              aria-label="Eraser"
+              aria-pressed="false"
+            >
+              <span class="icon"></span>
+            </button>
+            <button
+              id="tool-fill"
+              class="tool icon-button icon-bucket"
+              type="button"
+              title="Bucket fill"
+              aria-label="Bucket fill"
+              aria-pressed="false"
+            >
+              <span class="icon"></span>
+            </button>
           </div>
           <label for="brush-size" class="panel-label">Brush size</label>
-          <input id="brush-size" type="range" min="1" max="30" step="1" value="6" orient="vertical" aria-label="Brush size" title="Brush size" />
+          <input
+            id="brush-size"
+            type="range"
+            min="1"
+            max="30"
+            step="1"
+            value="6"
+            orient="vertical"
+            aria-label="Brush size"
+            title="Brush size"
+          />
           <!-- live preview of the brush: actual size, current color -->
-          <div id="brush-preview-box" aria-hidden="true"><span id="brush-preview"></span></div>
+          <div id="brush-preview-box" aria-hidden="true">
+            <span id="brush-preview"></span>
+          </div>
           <output id="save-status" aria-live="polite"></output>
         </aside>
 
-        <!-- center: the canvas (script.js creates the <canvas> in here) + Done button -->
-        <div id="canvas-col">
-          <section id="canvas-frame">
-            <div id="canvasDiv"></div>
-          </section>
-          <div id="draw-footer"></div>
-        </div>
+        <!-- center: the canvas (script.js creates the <canvas> in here) -->
+        <section id="canvas-frame">
+          <div id="canvasDiv"></div>
+        </section>
 
         <!-- right: color controls -->
-        <aside id="color-picker-panel" class="color-picker" aria-label="Drawing color controls">
+        <aside
+          id="color-picker-panel"
+          class="color-picker"
+          aria-label="Drawing color controls"
+        >
           <div class="panel-label">Layer</div>
           <div id="layer-toggle" role="radiogroup" aria-label="Drawing layer">
-            <button id="layer-fg" type="button" data-layer="fg" class="active" title="Draw in front">Foreground</button>
-            <button id="layer-bg" type="button" data-layer="bg" title="Draw behind">Background</button>
+            <button
+              id="layer-fg"
+              type="button"
+              data-layer="fg"
+              class="active"
+              title="Draw in front"
+            >
+              Foreground
+            </button>
+            <button
+              id="layer-bg"
+              type="button"
+              data-layer="bg"
+              title="Draw behind"
+            >
+              Background
+            </button>
           </div>
-          <canvas id="color-wheel" width="240" height="240" aria-label="Color wheel"></canvas>
+          <canvas
+            id="color-wheel"
+            width="240"
+            height="240"
+            aria-label="Color wheel"
+          ></canvas>
           <div id="color-row">
-            <button id="dropper" class="tool" type="button" title="Dropper: pick a color from the canvas" aria-pressed="false" aria-label="Dropper"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 3.5a2.1 2.1 0 0 0-3 0L14 7l-1.5-1.5-1.5 1.5 1.5 1.5L4 16.5V20h3.5L15.5 12l1.5 1.5 1.5-1.5L17 10l3.5-3.5a2.1 2.1 0 0 0 0-3z"/><path d="M4 20l.01 0"/></svg></button>
+            <button
+              id="dropper"
+              class="tool"
+              type="button"
+              title="Dropper: pick a color from the canvas"
+              aria-pressed="false"
+              aria-label="Dropper"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="22"
+                height="22"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path
+                  d="M20.5 3.5a2.1 2.1 0 0 0-3 0L14 7l-1.5-1.5-1.5 1.5 1.5 1.5L4 16.5V20h3.5L15.5 12l1.5 1.5 1.5-1.5L17 10l3.5-3.5a2.1 2.1 0 0 0 0-3z"
+                />
+                <path d="M4 20l.01 0" />
+              </svg>
+            </button>
             <output id="selected-color" aria-live="polite"></output>
           </div>
           <output id="dropper-status" aria-live="polite"></output>
@@ -70,8 +178,18 @@
           </div>
           <div class="panel-label">Saved colors</div>
           <div id="saved-slots" role="radiogroup" aria-label="Saved colors">
-            <button type="button" class="slot active" data-slot="0" title="Saved color 1"></button>
-            <button type="button" class="slot" data-slot="1" title="Saved color 2"></button>
+            <button
+              type="button"
+              class="slot active"
+              data-slot="0"
+              title="Saved color 1"
+            ></button>
+            <button
+              type="button"
+              class="slot"
+              data-slot="1"
+              title="Saved color 2"
+            ></button>
           </div>
           <div class="panel-label">Swatches</div>
           <div id="swatches"></div>
@@ -87,7 +205,10 @@
           <ol class="htp-steps">
             <li>
               <b>Trick or treat?</b>
-              <span><b>Treat</b> gets you a spooky image. <b>Trick</b> gets you a cheeky one.</span>
+              <span
+                ><b>Treat</b> gets you a spooky image. <b>Trick</b> gets you a
+                cheeky one.</span
+              >
             </li>
             <li>
               <b>Memorize it</b>
@@ -99,7 +220,9 @@
             </li>
             <li>
               <b>Compare</b>
-              <span>See yours next to the original, then save or share it.</span>
+              <span
+                >See yours next to the original, then save or share it.</span
+              >
             </li>
           </ol>
           <details class="htp-tips">
@@ -108,7 +231,10 @@
               <li><b>Ctrl/⌘ + Z</b> undoes your last stroke.</li>
               <li><b>Ctrl/⌘ + S</b> saves your drawing.</li>
               <li><b>Fill</b> colors in a whole shape.</li>
-              <li><b>Background / Foreground</b> picks whether you draw behind or in front.</li>
+              <li>
+                <b>Background / Foreground</b> picks whether you draw behind or
+                in front.
+              </li>
               <li>The <b>dropper</b> picks a color from your drawing.</li>
             </ul>
           </details>
@@ -131,16 +257,23 @@
           <div class="preview-frame">
             <img id="preview-img" alt="" />
           </div>
-          <p class="preview-caption">Draw this in <b id="preview-draw-time">1:00</b></p>
+          <p class="preview-caption">
+            Draw this in <b id="preview-draw-time">1:00</b>
+          </p>
           <p class="credit" id="preview-credit"></p>
         </div>
       </section>
 
       <!-- 4) results: yours vs. original -->
-      <section id="screen-results" class="screen" aria-labelledby="results-title">
+      <section
+        id="screen-results"
+        class="screen"
+        aria-labelledby="results-title"
+      >
         <h2 id="results-title">Time's up!</h2>
         <div id="results-score" aria-live="polite" hidden>
-          <span id="results-score-num">0</span><span class="score-max">/100</span>
+          <span id="results-score-num">0</span
+          ><span class="score-max">/100</span>
           <div id="results-score-msg"></div>
           <div id="results-streak-msg" hidden></div>
         </div>
@@ -166,7 +299,9 @@
 
     <!-- settings dialog (gear, available on every screen) -->
     <dialog id="settings-dialog" aria-labelledby="settings-title">
-      <button class="htp-close" type="button" aria-label="Close" data-close>&times;</button>
+      <button class="htp-close" type="button" aria-label="Close" data-close>
+        &times;
+      </button>
       <h2 id="settings-title">Settings</h2>
       <label class="setting">
         Drawing time
@@ -192,10 +327,16 @@
   <script src="js/ExportManager.js"></script>
   <script src="js/script.js"></script>
   <!-- js/config.js is gitignored: copy js/config.example.js and add your Unsplash key -->
-  <script src="js/config.js" onerror="console.info('No config.js, using emoji images')"></script>
+  <script
+    src="js/config.js"
+    onerror="console.info('No config.js, using emoji images')"
+  ></script>
   <script src="js/queries.js"></script>
   <!-- assets/pixabay/cache.js: run `node scripts/build-pixabay-cache.js` to create it -->
-  <script src="assets/pixabay/cache.js" onerror="console.info('No image cache, using the live API or emoji')"></script>
+  <script
+    src="assets/pixabay/cache.js"
+    onerror="console.info('No image cache, using the live API or emoji')"
+  ></script>
   <script src="js/imageApi.js"></script>
   <script src="js/scoring.js"></script>
   <script src="js/game.js"></script>
