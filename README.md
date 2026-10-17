@@ -4,7 +4,7 @@ This is a web based drawing application that uses **`HTML`**, **`CSS`** and **`J
 
 [Click here](https://sudipt1999.github.io/drawing-app/) to start drawing.
 
-![Drawing App Screenshot](drawing-app-screenshot.png)
+![Drawing App Screenshot](assets/ui/drawing-app-screenshot.png)
 
 ## Contributing
 

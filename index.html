@@ -83,8 +83,9 @@
     <div id="onstart-popup" role="dialog" aria-labelledby="popup-title">
       <h2 id="popup-title">Ghoulle 🎃</h2>
       <p>
-        Hit <b>New round</b> and an image flashes for 3 seconds. Then draw it
-        from memory before the timer runs out. Trick or treat?
+        Pick <b>🍬 Treat</b> for a spooky image or <b>🎭 Trick</b> for a
+        cheeky curveball. It flashes for 3 seconds, then draw it from memory
+        before the timer runs out.
       </p>
       <label class="setting">
         Drawing time
@@ -107,6 +108,9 @@
   <script src="script.js"></script>
   <!-- config.js is gitignored: copy config.example.js and add your Unsplash key -->
   <script src="config.js" onerror="console.info('No config.js, using emoji images')"></script>
+  <script src="queries.js"></script>
+  <!-- assets/unsplash/cache.js: run `node scripts/build-image-cache.js` to create it (optional) -->
+  <script src="assets/unsplash/cache.js" onerror="console.info('No image cache, using the live API or emoji')"></script>
   <script src="imageApi.js"></script>
   <script src="game.js"></script>
 </html>
