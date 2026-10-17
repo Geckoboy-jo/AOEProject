@@ -16,6 +16,8 @@
   overflow-y: auto;
   padding: 24px 16px;
   background: transparent; /* the page backdrop shows through */
+  color: #fff;
+  text-shadow: 0 1px 3px #000;
 }
 
 body[data-screen="start"] #screen-start,
@@ -65,7 +67,7 @@ body[data-screen="draw"] #draw-footer { display: flex; }
 .start-card {
   width: min(620px, 100%);
   padding: 24px;
-  background: #fff;
+  background: url("../assets/ui/ui-box-1x1.5.png") center / 100% 100% no-repeat;
 }
 
 .start-card h2 {
@@ -106,9 +108,7 @@ body[data-screen="draw"] #draw-footer { display: flex; }
   align-items: center;
   width: min(560px, 100%);
   padding: 20px;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 14px;
+  background: url("../assets/ui/ui-box-1x1.5.png") center / 100% 100% no-repeat;
   text-align: center;
 }
 
@@ -189,9 +189,7 @@ body[data-screen="draw"] #draw-footer { display: flex; }
   height: min(440px, calc(100vh - var(--header-h, 120px) - 320px));
   min-height: 160px;
   object-fit: contain;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  background: #fff;
+  background: url("../assets/ui/ui-box-1x2.png") center / 100% 100% no-repeat;
 }
 
 .results-actions {
