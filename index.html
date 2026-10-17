@@ -271,6 +271,12 @@
           <div id="results-score-msg"></div>
           <div id="results-streak-msg" hidden></div>
         </div>
+        <div id="results-judge" aria-live="polite" hidden>
+          <div class="judge-head">
+            Betelgeuse's verdict <span id="results-judge-score"></span>
+          </div>
+          <p id="results-judge-roast"></p>
+        </div>
         <div class="results-pair">
           <figure>
             <figcaption>Yours</figcaption>
@@ -336,6 +342,7 @@
   <script src="assets/paintings/cache.js" onerror="console.info('No paintings yet')"></script>
   <script src="js/imageApi.js"></script>
   <script src="js/scoring.js"></script>
+  <script src="js/backend.js"></script>
   <script src="js/Scoreboard.js"></script>
   <script src="js/game.js"></script>
 </html>

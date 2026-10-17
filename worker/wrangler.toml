@@ -1,0 +1,35 @@
+# Ghoulgle backend: Betelgeuse (Gemma 4 judge) + shared scoreboard.
+# The game itself is hosted on GitHub Pages; this Worker is only the API.
+# Run every wrangler command from inside this worker/ folder.
+
+name = "ghoulgle-api"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+# Plain (non-secret) settings, readable in the code as env.NAME.
+[vars]
+# Origins allowed to call this API (CORS). Origins have no path, so the
+# Pages site github.io/AOEProject is just https://geckoboy-jo.github.io.
+ALLOWED_ORIGINS = "https://geckoboy-jo.github.io,http://localhost:8000,http://127.0.0.1:8000,http://localhost:5500,http://127.0.0.1:5500"
+GEMMA_MODEL = "gemma-4-26b-a4b-it"
+
+# Secrets are NOT in this file. The Gemini API key was set with:
+#   npx wrangler secret put GEMINI_API_KEY
+# For `wrangler dev`, put GEMINI_API_KEY=... in worker/.dev.vars (gitignored).
+
+# Shared scoreboard storage (created with `wrangler kv namespace create SCORES`).
+[[kv_namespaces]]
+binding = "SCORES"
+id = "18b318897e874f489fe8db3cad79b0b5"
+
+# Per-IP rate limits so nobody can burn through the Gemini quota.
+# namespace_id is any number unique to your account.
+[[ratelimits]]
+name = "JUDGE_LIMITER"
+namespace_id = "1001"
+simple = { limit = 10, period = 60 }  # 10 judgments per minute per IP
+
+[[ratelimits]]
+name = "SCORE_LIMITER"
+namespace_id = "1002"
+simple = { limit = 20, period = 60 }

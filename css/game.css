@@ -239,3 +239,19 @@ body[data-screen="draw"] #draw-footer { display: flex; }
 }
 
 #results-painting a { color: inherit; }
+
+/* Betelgeuse's verdict (Gemma 4 judge) on the results screen */
+#results-judge {
+  width: min(900px, 100%);
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  text-shadow: 0 1px 3px #000;
+  text-align: center;
+}
+#results-judge .judge-head { font-size: 14px; opacity: 0.85; }
+#results-judge-score { margin-left: 8px; font-weight: bold; opacity: 1; }
+#results-judge-roast { margin: 4px 0 0; font-size: 18px; }
+#results-judge.loading #results-judge-roast { opacity: 0.7; font-style: italic; }

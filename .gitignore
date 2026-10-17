@@ -4,3 +4,8 @@ config.js
 assets/unsplash/*.jpg
 assets/unsplash/_rejected/
 .review/
+
+# Cloudflare Worker
+worker/.dev.vars
+worker/.wrangler/
+.wrangler/

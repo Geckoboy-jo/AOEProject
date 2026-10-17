@@ -137,6 +137,7 @@ const Game = (() => {
     timerEl.textContent = "";
     setScreen("start");
     renderStreakBoard();
+    Scoreboard.pull().then(() => screen === "start" && renderStreakBoard());
     nameInput.focus();
   }
 
@@ -211,6 +212,43 @@ const Game = (() => {
     $("results-status").textContent = "";
     showScore(canvas, current);
     setScreen("results");
+    showVerdict(canvas, current);
+  }
+
+  // Betelgeuse (Gemma 4 via the Worker) looks at both images and gives his own
+  // score and a roast. The local score above stays the official one for
+  // streaks and boards: it's instant, free, and works offline.
+  async function showVerdict(canvas, item) {
+    const box = $("results-judge");
+    if (!box) return;
+    box.hidden = true;
+    if (!canvas || typeof Backend === "undefined" || !Backend.enabled) return;
+    const scoreEl = $("results-judge-score");
+    const roastEl = $("results-judge-roast");
+    box.classList.add("loading");
+    scoreEl.textContent = "";
+    roastEl.textContent = "Betelgeuse is squinting at your drawing...";
+    box.hidden = false;
+
+    let verdict = null;
+    let failure = null;
+    try {
+      verdict = await Backend.judge(canvas, item);
+    } catch (err) {
+      failure = err;
+      console.warn("[Betelgeuse]", err.message);
+    }
+    if (current !== item || screen !== "results") return; // already moved on
+    box.classList.remove("loading");
+    if (verdict) {
+      scoreEl.textContent = `${verdict.score}/100`;
+      roastEl.textContent = verdict.roast;
+    } else {
+      roastEl.textContent =
+        failure && (failure.status === 429 || failure.status === 503)
+          ? "Betelgeuse is swamped with souls right now. Try again in a minute."
+          : "Betelgeuse wandered off. He'll judge the next one.";
+    }
   }
 
   function scoreMessage(s) {
@@ -239,7 +277,12 @@ const Game = (() => {
     const name = playerName();
     Scoreboard.addAccuracy(key, name, result.score);
     Scoreboard.addStreak(name, streak);
-    Scoreboard.render($("image-board"), "Top 10 for this image", Scoreboard.topAccuracies(key),     "accuracy", "%");
+    const renderImageBoard = () =>
+      Scoreboard.render($("image-board"), "Top 10 for this image", Scoreboard.topAccuracies(key), "accuracy", "%");
+    renderImageBoard();
+    Scoreboard.push(name, streak, key, result.score).then(() => {
+      if (current === item && screen === "results") renderImageBoard();
+    });
         const streakMsg = $("results-streak-msg");
         streakMsg.hidden = result.score < STREAK_MIN;
     streakMsg.textContent = `🔥 Streak increased by 1! (${streak} in a row)`;
