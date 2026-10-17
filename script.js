@@ -229,6 +229,14 @@ const createCanvas = () => {
         redraw();
     });
 
+    document.addEventListener("keydown", (e) => {
+        if (e.key !== "Backspace" || paint) return;
+        const t = e.target;
+        if (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
+        e.preventDefault();
+        backBtn.click();
+    });
+
     saveBtn.addEventListener("click", async () => {
         saveBtn.disabled = true;
         saveStatus.textContent = "Saving…";
