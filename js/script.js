@@ -37,7 +37,7 @@ const createCanvas = () => {
     let paint = false;
     let color = "#000000";
     let layer = "fg";
-    const sizes = { bg: 12, fg: 6 }; // brush size remembered per layer
+    const sizes = { bg: 3, fg: 6 }; // brush size remembered per layer
     let tool = "brush";
     let currentAction;
     const fillBtn = document.getElementById("tool-fill");
@@ -77,7 +77,7 @@ const createCanvas = () => {
             color = selectedColor;
             slots[activeSlot] = selectedColor;
             renderSlots();
-            setTool("brush"); // picking a color switches back to the brush
+            if (tool !== "fill") setTool("brush"); // picking a color switches back to the brush (fill stays)
         }
     );
 
