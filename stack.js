@@ -10,7 +10,8 @@ class Stack {
     }
 
     pop() {
-        this.canvases.pop();
+        const canvas = this.canvases.pop();
         this.top = this.canvases[this.canvases.length - 1];
+        return canvas;
     }
 }
