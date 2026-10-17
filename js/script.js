@@ -54,7 +54,9 @@ const createCanvas = () => {
 
     // size the canvas to fill its frame (and re-fit when the window changes)
     function fitCanvas() {
-        const { width, height } = canvasDiv.getBoundingClientRect();
+        // layout size, unaffected by the frame's CSS transform: scale()
+        const width = canvasDiv.clientWidth;
+        const height = canvasDiv.clientHeight;
         canvas.style.width = `${width}px`;
         canvas.style.height = `${height}px`;
         canvas.width = Math.max(1, Math.round(width * RENDER_SCALE));
@@ -318,8 +320,7 @@ const createCanvas = () => {
             else drawStroke(ctx, action);
         });
 
-        context.fillStyle = CANVAS_BG;
-        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.clearRect(0, 0, canvas.width, canvas.height);
         context.drawImage(layerCanvases.bg, 0, 0);
         context.drawImage(layerCanvases.fg, 0, 0);
     }

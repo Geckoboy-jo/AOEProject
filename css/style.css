@@ -102,9 +102,19 @@ body {
 #canvas-col {
   display: flex;
   flex-direction: column;
+  align-items: center;
   min-width: 0;
   min-height: 0;
 }
+
+/* spacers that center the canvas frame, each 10% of the column height */
+#canvas-col::before,
+#canvas-col::after {
+  content: "";
+  flex: 1 1 0;
+}
+#canvas-col::after { order: 2; }
+#draw-footer { order: 3; }
 
 #draw-footer {
   justify-content: center;
@@ -149,7 +159,7 @@ body {
 /* ---- 3-column workspace ---- */
 #workspace {
   display: grid;
-  grid-template-columns: 72px 1fr 240px;
+  grid-template-columns: 240px 1fr 240px; /* equal side columns keep the canvas on the screen's center line */
   gap: 12px;
   padding: 12px;
   min-height: 0; /* lets the canvas shrink instead of overflowing */
@@ -160,6 +170,8 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-self: start;
+  width: 72px;
   gap: 8px;
   padding: 8px 0;
 }
@@ -249,11 +261,25 @@ body {
 /* center canvas: script.js sizes the <canvas> to fill #canvasDiv */
 #canvas-frame {
   position: relative;
-  flex: 1;
+  flex: 8 1 0; /* 80% of the column height; the ::before/::after spacers share the rest */
+  order: 1;
+  width: 80%;
   min-width: 0;
   min-height: 0;
-  margin: 0 6%;
+  margin: 0 auto;
+  transform: scale(0.8);
+  transform-origin: center;
   border: 1px solid #333;
+}
+
+/* notebook pad: larger than the drawing field, sits behind it */
+#canvas-frame::before {
+  content: "";
+  position: absolute;
+  inset: -17% -10%;
+  background: url("../assets/ui/ui-canvas.png") center / 100% 100% no-repeat;
+  image-rendering: pixelated;
+  pointer-events: none;
 }
 
 #canvasDiv {
@@ -560,10 +586,12 @@ body {
   #toolbar {
     flex-direction: row;
     justify-content: center;
+    justify-self: stretch;
+    width: auto;
   }
 
   #canvas-frame {
     flex: none;
-    height: 60vh;
+    height: 48vh;
   }
 }
