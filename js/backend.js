@@ -93,6 +93,20 @@ const Backend = (() => {
     "Nothing? Did the image scare the pencil right out of your hand?",
   ];
 
+  // Last few roasts (kept across reloads) so the Worker can tell Betelgeuse
+  // not to repeat himself.
+  const RECENT_KEY = "ghoulgle-recent-roasts";
+  let recentRoasts = [];
+  try {
+    recentRoasts = JSON.parse(localStorage.getItem(RECENT_KEY)) || [];
+  } catch (err) {}
+  function remember(roast) {
+    recentRoasts = [...recentRoasts, roast].slice(-5);
+    try {
+      localStorage.setItem(RECENT_KEY, JSON.stringify(recentRoasts));
+    } catch (err) {}
+  }
+
   // ---------- API ----------
   async function judge(canvas, item) {
     if (isBlank(canvas)) {
@@ -102,10 +116,17 @@ const Backend = (() => {
     const drawing = toJpeg(canvas, canvas.width, canvas.height);
     const img = await loadImage(item.src);
     const original = toJpeg(img, img.naturalWidth || 512, img.naturalHeight || 512);
-    return call("/judge", {
-      body: { drawing, original, prompt: item.painting ? item.painting.title : item.prompt },
+    const verdict = await call("/judge", {
+      body: {
+        drawing,
+        original,
+        prompt: item.painting ? item.painting.title : item.prompt,
+        recent: recentRoasts,
+      },
       timeoutMs: 25000,
     });
+    if (verdict && verdict.roast) remember(verdict.roast);
+    return verdict;
   }
 
   const getScores = (imageKey) =>
