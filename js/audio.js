@@ -8,16 +8,53 @@
 
 const Sfx = (() => {
   const DIR = "assets/sounds/";
+  const MUSIC_BASE_VOLUME = 0.3;
 
   const music = new Audio(DIR + "music-background.mp3");
   music.loop = true;
-  music.volume = 0.3;
 
   const sounds = {};
   for (const name of ["select", "back", "pass", "fail", "clock", "lightning", "dracula-laugh"]) {
     sounds[name] = new Audio(`${DIR}sound-${name}.wav`);
     sounds[name].preload = "auto";
   }
+
+  const volumeSlider = document.getElementById("sound-volume");
+  const volumeValue = document.getElementById("sound-volume-value");
+  let volume = 1;
+  try {
+    const storedVolume = localStorage.getItem("ghoulle-volume");
+    if (storedVolume !== null) {
+      const parsedVolume = Number(storedVolume);
+      if (Number.isFinite(parsedVolume) && parsedVolume >= 0 && parsedVolume <= 1) {
+        volume = parsedVolume;
+      }
+    }
+  } catch (err) {
+    console.warn("Audio volume preference couldn't be loaded", err);
+  }
+
+  function applyVolume() {
+    music.volume = MUSIC_BASE_VOLUME * volume;
+    Object.values(sounds).forEach((sound) => {
+      sound.volume = volume;
+    });
+    if (volumeSlider) volumeSlider.value = String(Math.round(volume * 100));
+    if (volumeValue) volumeValue.value = `${Math.round(volume * 100)}%`;
+  }
+
+  if (volumeSlider) {
+    volumeSlider.addEventListener("input", () => {
+      volume = Number(volumeSlider.value) / 100;
+      applyVolume();
+      try {
+        localStorage.setItem("ghoulle-volume", String(volume));
+      } catch (err) {
+        console.warn("Audio volume preference couldn't be saved", err);
+      }
+    });
+  }
+  applyVolume();
 
   let clockOn = false;
 

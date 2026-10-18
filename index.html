@@ -314,6 +314,13 @@
           <option value="300">5:00</option>
         </select>
       </label>
+      <label class="setting" for="sound-volume">
+        Sound volume
+        <span class="volume-control">
+          <input id="sound-volume" type="range" min="0" max="100" step="1" value="100" />
+          <output id="sound-volume-value" for="sound-volume">100%</output>
+        </span>
+      </label>
       <div class="settings-actions">
         <button id="settings-quit" type="button">Back to start</button>
         <button type="button" data-close>Done</button>

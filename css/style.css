@@ -539,6 +539,22 @@ body {
   margin: 12px 0 18px;
 }
 
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#sound-volume {
+  flex: 1;
+  min-width: 0;
+}
+
+#sound-volume-value {
+  min-width: 3.5em;
+  text-align: right;
+}
+
 .settings-actions {
   display: flex;
   justify-content: flex-end;
