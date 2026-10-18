@@ -400,6 +400,7 @@ const createCanvas = () => {
         const t = e.target;
         if (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
         e.preventDefault();
+        Sfx.back();
         backBtn.click();
     });
 

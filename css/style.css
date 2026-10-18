@@ -50,28 +50,19 @@ body {
   image-rendering: pixelated;
 }
 
-/* Logo is 127x41 pixel art. Same size on every screen; only shrinks on
-   short windows, in whole-number steps so every pixel stays the same size. */
+/* Logo is 127x41 pixel art. Same size on every screen; scales with the
+   window's width (height follows from the aspect ratio). */
 .logo {
   display: block;
-  height: 123px; /* 3x */
-  width: auto;
+  width: clamp(190px, 30vw, 560px);
+  height: auto;
   image-rendering: pixelated;
   max-width: 100%;
   margin: 0 auto;
 }
 
 @media (max-height: 800px) {
-  .logo {
-    height: 82px;
-  } /* 2x */
   #workspace { padding: 6px 12px; }
-}
-
-@media (max-height: 640px) {
-  .logo {
-    height: 41px;
-  } /* 1x */
 }
 
 #toolbar,
@@ -113,12 +104,12 @@ body {
   content: "";
   flex: 1 1 0;
 }
-#canvas-col::after { order: 2; }
-#draw-footer { order: 3; }
+#canvas-col::after { order: 3; }
+#draw-footer { order: 2; } /* right under the canvas, above the bottom spacer */
 
 #draw-footer {
   justify-content: center;
-  padding-top: 6px;
+  padding-top: 16px;
 }
 
 /* ---- header ---- */

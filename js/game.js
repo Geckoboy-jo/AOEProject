@@ -91,6 +91,7 @@ const Game = (() => {
     clearInterval(timer);
     timer = null;
     timerEl.classList.remove("urgent");
+    Sfx.stopClock();
   }
 
   // counts down `seconds` in the header, then calls onDone
@@ -100,7 +101,9 @@ const Game = (() => {
     const tick = () => {
       const left = (end - Date.now()) / 1000;
       timerEl.textContent = fmt(left);
+      const urgent = urgentAt > 0 && left <= urgentAt && left > 0;
       timerEl.classList.toggle("urgent", left <= urgentAt && left > 0);
+      if (urgent) Sfx.startClock();
       if (left <= 0) {
         stopTimer();
         onDone();
@@ -167,6 +170,7 @@ const Game = (() => {
     $("preview-draw-time").textContent = fmt(drawSeconds());
     $("preview-credit").innerHTML = creditHTML(current);
     setScreen("preview");
+    Sfx.reveal();
 
     countdown(MODES[mode].viewSeconds, startDrawing, 0);
   }
@@ -269,6 +273,8 @@ const Game = (() => {
     });
     if (current !== item || screen !== "results" || !result) return;
     $("results-score-num").textContent = result.score;
+    if (result.score < 50) Sfx.fail();
+    else Sfx.pass();
     $("results-score-msg").textContent = result.estimated
       ? "Estimated from your drawing only (the original image couldn't be read; run the game from a local server like VS Code Live Server)."
       : scoreMessage(result.score);
