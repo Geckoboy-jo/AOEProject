@@ -253,3 +253,4 @@ body[data-screen="draw"] #draw-footer { display: flex; }
 #results-judge-score { margin-left: 8px; font-weight: bold; opacity: 1; }
 #results-judge-roast { margin: 4px 0 0; font-size: 18px; }
 #results-judge.loading #results-judge-roast { opacity: 0.7; font-style: italic; }
+#results-judge .judge-model { margin-top: 6px; font-size: 12px; opacity: 0.7; }

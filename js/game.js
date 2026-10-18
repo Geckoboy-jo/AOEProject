@@ -219,6 +219,12 @@ const Game = (() => {
     showVerdict(canvas, current);
   }
 
+  // "gemma-4-26b-a4b-it" -> "Gemma 4 26B"
+  function modelName(id) {
+    const m = /^gemma-(\d+)-(\d+)b/i.exec(id || "");
+    return m ? `Gemma ${m[1]} ${m[2]}B` : id;
+  }
+
   // Betelgeuse (Gemma 4 via the Worker) looks at both images and gives his own
   // score and a roast. The local score above stays the official one for
   // streaks and boards: it's instant, free, and works offline.
@@ -229,7 +235,9 @@ const Game = (() => {
     if (!canvas || typeof Backend === "undefined" || !Backend.enabled) return;
     const scoreEl = $("results-judge-score");
     const roastEl = $("results-judge-roast");
+    const modelEl = $("results-judge-model");
     box.classList.add("loading");
+    modelEl.textContent = "";
     scoreEl.textContent = "";
     roastEl.textContent = "Betelgeuse is squinting at your drawing...";
     box.hidden = false;
@@ -247,6 +255,10 @@ const Game = (() => {
     if (verdict) {
       scoreEl.textContent = `${verdict.score}/100`;
       roastEl.textContent = verdict.roast;
+      // credit the model that actually judged it (blank canvases skip the call)
+      if (verdict.model) {
+        modelEl.textContent = `Judged by ${modelName(verdict.model)}, an open-weight model from Google DeepMind, looking at both images`;
+      }
     } else {
       roastEl.textContent =
         failure && (failure.status === 429 || failure.status === 503)
