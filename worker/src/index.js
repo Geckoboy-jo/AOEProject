@@ -108,19 +108,47 @@ function parseImage(dataUrl, label) {
   return { inline_data: { mime_type: m[1], data: m[2] } };
 }
 
-function judgePrompt(subject) {
+// A different comedic angle each round so Betelgeuse doesn't fall into one template.
+const ANGLES = [
+  "a snooty art critic at a gallery opening",
+  "a sports commentator calling a blooper replay",
+  "a disappointed ghost parent at the school art show",
+  "a dramatic horror movie trailer narrator",
+  "a Victorian ghost who has haunted too many portrait galleries",
+  "a haunted house real estate agent spinning every flaw as a feature",
+  "a museum curator writing the label for a cursed artifact",
+  "a nature documentary narrator observing a strange new creature",
+  "a fortune teller reading omens in the pencil lines",
+  "a cooking show judge tasting the drawing",
+  "a detective reconstructing what went wrong at the scene",
+  "a game show host revealing the answer to the audience",
+  "a grumpy ghost writing a one-star review",
+  "a wedding toast that goes slightly off the rails",
+];
+
+function judgePrompt(subject, angle, recent) {
   return [
     "You are Betelgeuse, the cheeky ghost judge of Ghoulgle, a Halloween drawing game.",
     "The player looked at the FIRST image for a few seconds, then drew the SECOND image from memory.",
     subject ? `The first image was found by searching for: "${subject}".` : "",
-    "Score how well the drawing captures the original from memory, from 1 to 100.",
+    "",
+    "Step 1, saw: in under 15 words, say what the drawing actually shows (shapes, colors, what's missing).",
+    "Step 2, score: how well the drawing captures the original from memory, 1 to 100.",
     "Reward getting the main subject, shapes, layout and colors right. Be generous to rough",
     "sketches that clearly got the idea; a blank or unrelated drawing scores under 10.",
-    "Then write one short roast in your voice: playful, spooky, at most 25 words,",
-    "PG, no emoji, and mention something specific you can see in the drawing.",
-    'Reply with ONLY JSON, no code fences: {"score": <integer 1-100>, "roast": "<text>"}',
+    `Step 3, roast: one line in Betelgeuse's voice, delivered like ${angle}.`,
+    "Build the joke on a specific detail from your 'saw' note, not on the subject in general.",
+    "If the drawing is good, give a backhanded compliment instead of an insult.",
+    "Playful and spooky, PG, no emoji, at most 25 words.",
+    "Do not start with \"Your\", \"Did you\", \"Ah\", or \"Well\".",
+    recent.length
+      ? "You already said these this session. Use a different structure, opening and punchline:\n" +
+        recent.map((r) => `- ${r}`).join("\n")
+      : "",
+    "",
+    'Reply with ONLY JSON, no code fences: {"saw": "<text>", "score": <integer 1-100>, "roast": "<text>"}',
   ]
-    .filter(Boolean)
+    .filter((l) => l !== "")
     .join("\n");
 }
 
@@ -132,6 +160,12 @@ async function judge(request, env) {
   const original = parseImage(body.original, "original");
   const drawing = parseImage(body.drawing, "drawing");
   const subject = typeof body.prompt === "string" ? body.prompt.slice(0, 100) : "";
+  // the player's last few roasts, so Betelgeuse doesn't repeat himself
+  const recent = (Array.isArray(body.recent) ? body.recent : [])
+    .filter((r) => typeof r === "string")
+    .slice(-5)
+    .map((r) => r.replace(/\s+/g, " ").slice(0, 200));
+  const angle = ANGLES[Math.floor(Math.random() * ANGLES.length)];
 
   const model = env.GEMMA_MODEL || "gemma-4-26b-a4b-it";
   const res = await fetch(
@@ -143,10 +177,10 @@ async function judge(request, env) {
         contents: [
           {
             role: "user",
-            parts: [{ text: judgePrompt(subject) }, original, drawing],
+            parts: [{ text: judgePrompt(subject, angle, recent) }, original, drawing],
           },
         ],
-        generationConfig: { temperature: 0.9, maxOutputTokens: 1024 },
+        generationConfig: { temperature: 1.0, topP: 0.95, maxOutputTokens: 1024 },
       }),
     }
   );
